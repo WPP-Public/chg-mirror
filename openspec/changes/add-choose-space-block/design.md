@@ -169,8 +169,16 @@ browser baseline must be checked before the repo depends on it.
 - Arrow controls are appended to a **sibling** of the observed element. Mutating the observed
   element inside its own `ResizeObserver` callback would loop.
 - Listener references are retained so `destroy()` can remove exactly what it added.
-- Media loading changes the tab list width; the observer already covers it, so no extra `load`
-  handler is needed.
+- The observer watches the tab list **and every tab**. A `ResizeObserver` reports changes to the
+  observed element's own box, so watching the scroll container alone never fires when only its
+  content grows.
+- **The first measurement cannot be trusted and must not be the only one.** Blocks decorate while
+  their section is still hidden, so that pass measures zero and finds no overflow. `ResizeObserver`
+  normally corrects this once the section is shown, but its callbacks are delivered per rendered
+  frame, so a background or occluded tab leaves an overflowing list without controls indefinitely.
+  A `MutationObserver` on the section's `data-section-status` re-runs the measurement when the
+  section becomes visible; mutation records are delivered on the microtask queue, independent of
+  rendering.
 - The observer is disconnected when the block leaves the DOM, which the Universal Editor does on
   every item re-render.
 
@@ -214,6 +222,25 @@ Consequences for this block: apply the trim to the eyebrow, title, description, 
 label and section title, then verify spacing by measuring against the artboard rather than by
 computing it from `line-height`.
 
+### D9 — The text link honours the padding token, not the Figma frame height
+
+`Button/text-standard` sets `padding-block`, `gap` and `corner-standard` but no height; it is
+`size-full` inside a `text-links` frame fixed at 40px, so in Figma the padding overflows a fixed
+frame and is absorbed. CSS cannot absorb it, so the two cannot both hold.
+
+Decision: honour `--component-button-padding-block`. Measured result at 1440 is a 43px link against
+the artboard's 40px. The remaining 3px is a defect in the Figma component, raised with the designer
+rather than papered over in CSS.
+
+The link is a **block** box, not `inline-flex`. `text-box-trim` only applies to a box whose text is
+direct content; as a flex container the label lands in an anonymous flex item and the trim is
+silently ignored, which is what produced 54px before the box type was corrected.
+
+| Link height                        | mobile | tablet | desktop |
+| ---------------------------------- | ------ | ------ | ------- |
+| `--component-button-padding-block` | 4px    | 8px    | 16px    |
+| rendered, cap-trimmed              | 17.8px | 27px   | 43px    |
+
 ## Risks / Trade-offs
 
 - **Completing `--component-button-padding-block` at desktop changes `destination-introduction`.**
@@ -224,10 +251,8 @@ computing it from `line-height`.
   (`I6047:27021;4214:5202;6047:25034`): the component applies `padding-block`, `gap` and
   `corner-standard` but sets no height of its own — it is `size-full` inside a `text-links` frame
   fixed at 40px, so `--component-button-height` belongs to the wrapper, not the link.
-  → Do not emit `height` on the link. Its rendered height depends on cap trim
-  (`text-box-trim: trim-both; text-box-edge: cap alphabetic`), which makes the content box
-  cap-height rather than line-height, so the box cannot be predicted from `padding-block` and
-  `line-height` alone. Measure it in the browser against the artboard.
+  → Resolved by D9: honour the padding token, accept 43px against the artboard's 40px, and raise
+  the 3px discrepancy with the designer.
 
 - **`100vw` includes the scrollbar, so desktop padding is computed from a slightly wider box than
   the visible area.** → Accepted deliberately: it is what makes the 1440px device match the
@@ -251,5 +276,7 @@ block is the corrected desktop button padding, which reverts with the same commi
 
 ## Open Questions
 
-- None blocking. The text link box model is settled as a measurement task: no explicit height,
-  `padding-block` from the token, cap trim applied, verified in the browser against the artboard.
+- **Figma `Button/text-standard` is internally inconsistent**: its `padding-block` of 16 at desktop
+  cannot fit the 40px `text-links` frame it is placed in, even with the text box trimmed to cap
+  height. The implementation follows the token (43px, see D9). To be discussed with the designer so
+  the component is corrected at source rather than compensated for per block.

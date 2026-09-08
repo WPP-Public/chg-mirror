@@ -147,6 +147,14 @@ the tabs do not fit.
 - **THEN** carousel controls are rendered and the tab list becomes horizontally scrollable with
   snap positions
 
+#### Scenario: Overflow is re-evaluated once the section becomes visible
+
+- **WHEN** the block is decorated while its section is still hidden, so the first measurement
+  reports no overflow
+- **THEN** the measurement is repeated when the section is marked loaded
+- **AND** the carousel appears if the tab list overflows, without depending on the page rendering a
+  frame
+
 #### Scenario: Resize crossing the threshold initialises and tears down
 
 - **WHEN** the available width shrinks so the tabs no longer fit

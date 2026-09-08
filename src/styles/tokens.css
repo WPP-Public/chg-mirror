@@ -21,6 +21,10 @@
     --breakpoint-tablet-max: 1199px;
     --breakpoint-desktop-min: 1200px;
 
+    /* multiplier for viewport-proportional spacing; 1px below desktop so
+       calc(N * var(--fluid-unit)) equals N pixels there. See the desktop block. */
+    --fluid-unit: 1px;
+
     /* color / surface */
     --color-surface-page: #ffffff;
     --color-surface-primary-default: #ffffff;
@@ -88,6 +92,10 @@
     --typography-fontsize-body-s: 12px;
     --typography-line-height-body-sm: 16px;
 
+    /* typography / paragraph spacing (breakpoint-independent so far; only the
+       values an existing block consumes are modelled) */
+    --typography-paragraph-spacing-body-m: 16px;
+
     /* dimension / spacing scale (breakpoint-independent) */
     --dimension-spacing-general-min: 0px;
     --dimension-spacing-general-2xs: 4px;
@@ -102,6 +110,15 @@
     --dimension-spacing-general-5xl: 80px;
     --dimension-spacing-eyebrow-to-title: 12px;
     --dimension-spacing-eyebrow-to-text: 12px;
+    /* Figma `dimension/spacing/title-to-content`. A separate variable from
+       `heading-to-content` below, which Figma resolves to 48 at 1440 while this
+       one resolves to 56 - do not merge them. */
+    --dimension-spacing-title-to-content: 32px;
+    /* Figma `dimension/spacing/heading-to-content`. Known discrepancy: Figma
+       resolves this to 48 at the 1440 artboard, not the 56 declared in the
+       desktop block below, and the 393/834 values are still unsampled. Only
+       `destination-introduction` consumes it, so the correction is deferred to
+       its own change rather than ridden along with an unrelated block. */
     --dimension-spacing-heading-to-content: 32px;
     --dimension-spacing-vertical-module-to-text: 32px;
 
@@ -128,6 +145,14 @@
     /* dimension / layout / carousel */
     --dimension-layout-carousel-item-gap-l: 20px;
     --dimension-layout-carousel-item-gap-s: 4px;
+    --dimension-layout-carousel-item-gap-xl: 32px;
+
+    /* dimension / layout / margin */
+    --dimension-layout-margin-m: 40px;
+
+    /* dimension / viewport (the Figma artboard the breakpoint is sampled from;
+       unitless so it can divide a length in calc()) */
+    --dimension-viewport-width: 393;
 
     /* corner radius */
     --corner-radius-none: 0px;
@@ -183,7 +208,14 @@
         --dimension-spacing-general-2xs: 8px;
         --dimension-spacing-eyebrow-to-title: 14px;
         --dimension-spacing-eyebrow-to-text: 16px;
+        --dimension-spacing-title-to-content: 48px;
         --dimension-spacing-heading-to-content: 48px;
+
+        /* dimension / viewport (tablet artboard) */
+        --dimension-viewport-width: 834;
+
+        /* dimension / layout / carousel (tablet) */
+        --dimension-layout-carousel-item-gap-xl: 40px;
 
         /* dimension / layout / module (tablet) */
         --dimension-layout-module-padding-top: 112px;
@@ -220,7 +252,14 @@
         --typography-line-height-body-md: 22px;
 
         --dimension-spacing-eyebrow-to-text: 20px;
+        --dimension-spacing-title-to-content: 56px;
         --dimension-spacing-heading-to-content: 56px;
+
+        /* dimension / viewport (desktop artboard) */
+        --dimension-viewport-width: 1440;
+
+        /* dimension / layout / margin (desktop) */
+        --dimension-layout-margin-m: 80px;
 
         /* dimension / layout / module (desktop; gutter-xs has no sampled
            tablet value, so it still steps up directly here. padding-inline-xs
@@ -243,5 +282,18 @@
         /* component / toggle (desktop) */
         --component-toogle-selector-dot: 24px;
         --component-toogle-width: 80px;
+
+        /* component / button (desktop; Figma's shared Button defines 16 at 1440.
+           The mobile and tablet steps were transcribed but this one was missed) */
+        --component-button-padding-block: 16px;
+
+        /* Desktop spacing scales with the viewport instead of stepping: a value
+           written as calc(N * var(--fluid-unit)) renders exactly N Figma pixels
+           at the 1440 artboard and stays proportional either side of it, with no
+           upper clamp. Uses vw, not cqi: cqi subtracts the classic scrollbar and
+           would render 292.9px where the design asks for 296px on a 1440 device.
+           Only ever multiply it into padding, margin or gap - feeding it into
+           width would reintroduce the usual 100vw overflow. */
+        --fluid-unit: calc(100vw / var(--dimension-viewport-width));
     }
 }

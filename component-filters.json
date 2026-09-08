@@ -28,7 +28,8 @@
       "interactive-asset",
       "filters-grid",
       "offers-carousel",
-      "text-with-cta"
+      "text-with-cta",
+      "choose-space"
     ]
   },
   {
@@ -121,6 +122,12 @@
     "id": "cards",
     "components": [
       "card"
+    ]
+  },
+  {
+    "id": "choose-space",
+    "components": [
+      "space-option"
     ]
   },
   {
