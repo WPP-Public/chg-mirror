@@ -488,6 +488,15 @@ button.header-menu-category-trigger::after {
     }
 }
 
+/* Narrow tablet (768px-899px): the content column shrinks to ~112-243px here,
+   too tight for two-column link text (labels overlap); stack single-column
+   until there's room again at 900px+ */
+@media (min-width: 768px) and (max-width: 899px) {
+    .header-menu-link-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 /* Desktop (>=1200px): three explicit columns, matching Figma */
 @media (min-width: 1200px) {
     .header-inner,

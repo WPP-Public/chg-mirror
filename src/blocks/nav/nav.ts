@@ -89,6 +89,16 @@ function buildCategoryPromo(item: Element): HTMLDivElement | null {
   const promo = document.createElement('div');
   promo.className = 'nav-category-promo';
   if (picture) {
+    // Swap src -> data-src on the source img *before* cloning: cloning/inserting an
+    // img with a resolved src fetches it immediately even while fully detached, so this
+    // avoids requesting every category's promo image up front (see header.ts setActiveCategory,
+    // which restores src only for the category actually shown).
+    const sourceImg = picture.querySelector('img');
+    const src = sourceImg?.getAttribute('src');
+    if (sourceImg && src) {
+      sourceImg.removeAttribute('src');
+      sourceImg.dataset.src = src;
+    }
     const clonedPicture = picture.cloneNode(true) as Element;
     const clonedImg = clonedPicture.querySelector('img');
     if (clonedImg && !clonedImg.getAttribute('alt')) {

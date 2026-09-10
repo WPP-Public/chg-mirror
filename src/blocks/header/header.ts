@@ -295,7 +295,15 @@ function setActiveCategory(
     if (active.picture) {
       const picture = active.picture.cloneNode(true) as Element;
       const img = picture.querySelector('img');
-      if (img && !img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
+      if (img) {
+        if (!img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
+        // restore the src that nav.ts deferred to data-src, now that this category is actually shown
+        const dataSrc = img.dataset.src;
+        if (dataSrc) {
+          img.src = dataSrc;
+          delete img.dataset.src;
+        }
+      }
       promo.imageContainer.append(picture);
     }
     promo.cta.href = active.ctaHref;
@@ -323,7 +331,7 @@ function buildMenuPromo(): { root: HTMLDivElement; imageContainer: HTMLDivElemen
 function buildMenuCategories(
   categories: NavCategory[],
   promo: { root: HTMLDivElement; imageContainer: HTMLDivElement; cta: HTMLAnchorElement },
-): HTMLUListElement {
+): { list: HTMLUListElement; activateInitial: () => void } {
   const list = document.createElement('ul');
   list.className = 'header-menu-categories';
 
@@ -368,9 +376,13 @@ function buildMenuCategories(
   });
 
   const firstExpandable = entries.findIndex((entry) => entry.category.regions.length);
-  if (firstExpandable !== -1) setActiveCategory(entries, promo, firstExpandable);
+  // Deferred until the menu is first opened, so the promo <picture> isn't inserted (and its
+  // image requested) on every page load while the panel is still closed.
+  const activateInitial = () => {
+    if (firstExpandable !== -1) setActiveCategory(entries, promo, firstExpandable);
+  };
 
-  return list;
+  return { list, activateInitial };
 }
 
 function buildMenuPanel(
@@ -380,7 +392,7 @@ function buildMenuPanel(
   ctaLabel: string,
   ctaHref: string,
   logo: HTMLAnchorElement,
-): { panel: HTMLDivElement; closeButton: HTMLButtonElement } {
+): { panel: HTMLDivElement; closeButton: HTMLButtonElement; activateInitial: () => void } {
   const panel = document.createElement('div');
   panel.className = 'header-menu-panel';
   panel.setAttribute('aria-hidden', 'true');
@@ -407,7 +419,8 @@ function buildMenuPanel(
   body.className = 'header-menu-body';
 
   const promo = buildMenuPromo();
-  body.append(buildMenuCategories(categories, promo), promo.root);
+  const { list: categoryList, activateInitial } = buildMenuCategories(categories, promo);
+  body.append(categoryList, promo.root);
 
   const bottomLang = document.createElement('div');
   bottomLang.className = 'header-menu-bottom-lang';
@@ -415,7 +428,7 @@ function buildMenuPanel(
   body.append(bottomLang);
 
   panel.append(top, body);
-  return { panel, closeButton };
+  return { panel, closeButton, activateInitial };
 }
 
 export default async function decorate(block: HTMLElement): Promise<void> {
@@ -461,7 +474,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const menuToggle = buildMenuToggle();
   const langZone = buildLangZone(languages, activeLang.shortLabel);
   const cta = buildCtaZone(ctaAnchor?.textContent?.trim() ?? '', ctaAnchor?.getAttribute('href') ?? '');
-  const { panel, closeButton } = buildMenuPanel(
+  const { panel, closeButton, activateInitial } = buildMenuPanel(
     categories,
     languages,
     activeLang.shortLabel,
@@ -479,7 +492,12 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     if (hadFocusInPanel) menuToggle.focus();
   };
 
+  let menuActivated = false;
   const openMenu = () => {
+    if (!menuActivated) {
+      menuActivated = true;
+      activateInitial();
+    }
     panel.classList.add('is-open');
     panel.setAttribute('aria-hidden', 'false');
     menuToggle.setAttribute('aria-expanded', 'true');
