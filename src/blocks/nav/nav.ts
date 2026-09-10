@@ -23,7 +23,7 @@ function linkOf(scope: Element, name: string): string {
 }
 
 function pictureOf(scope: Element, name: string): Element | null {
-  return fieldOf(scope, name)?.querySelector('picture');
+  return fieldOf(scope, name)?.querySelector('picture') ?? null;
 }
 
 function itemsOf(scope: Element, model: string): Element[] {
