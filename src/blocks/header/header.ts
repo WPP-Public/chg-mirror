@@ -462,7 +462,6 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     panel.setAttribute('aria-hidden', 'true');
     menuToggle.setAttribute('aria-expanded', 'false');
     menuToggle.setAttribute('aria-label', 'Open navigation menu');
-    document.body.style.overflow = '';
     if (hadFocusInPanel) menuToggle.focus();
   };
 
@@ -476,7 +475,6 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     panel.setAttribute('aria-hidden', 'false');
     menuToggle.setAttribute('aria-expanded', 'true');
     menuToggle.setAttribute('aria-label', 'Close navigation menu');
-    document.body.style.overflow = 'hidden';
     panel.focus();
   };
 
