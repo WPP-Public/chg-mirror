@@ -389,31 +389,11 @@ function buildMenuPanel(
   categories: NavCategory[],
   languages: NavLanguage[],
   activeLangLabel: string,
-  ctaLabel: string,
-  ctaHref: string,
-  logo: HTMLAnchorElement,
-): { panel: HTMLDivElement; closeButton: HTMLButtonElement; activateInitial: () => void } {
+): { panel: HTMLDivElement; activateInitial: () => void } {
   const panel = document.createElement('div');
   panel.className = 'header-menu-panel';
   panel.setAttribute('aria-hidden', 'true');
-
-  const top = document.createElement('div');
-  top.className = 'header-menu-top';
-
-  const closeButton = document.createElement('button');
-  closeButton.className = 'header-menu-close';
-  closeButton.type = 'button';
-  closeButton.setAttribute('aria-label', 'Close navigation menu');
-  closeButton.innerHTML = '<span aria-hidden="true">x</span><span>CLOSE</span>';
-
-  const panelLogo = logo.cloneNode(true) as HTMLAnchorElement;
-  const tools = document.createElement('div');
-  tools.className = 'header-menu-tools';
-  const topCta = buildCtaZone(ctaLabel, ctaHref);
-  tools.append(buildLangZone(languages, activeLangLabel));
-  if (topCta) tools.append(topCta);
-
-  top.append(closeButton, panelLogo, tools);
+  panel.tabIndex = -1;
 
   const body = document.createElement('div');
   body.className = 'header-menu-body';
@@ -427,8 +407,8 @@ function buildMenuPanel(
   bottomLang.append(buildLangZone(languages, activeLangLabel));
   body.append(bottomLang);
 
-  panel.append(top, body);
-  return { panel, closeButton, activateInitial };
+  panel.append(body);
+  return { panel, activateInitial };
 }
 
 export default async function decorate(block: HTMLElement): Promise<void> {
@@ -474,20 +454,14 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   const menuToggle = buildMenuToggle();
   const langZone = buildLangZone(languages, activeLang.shortLabel);
   const cta = buildCtaZone(ctaAnchor?.textContent?.trim() ?? '', ctaAnchor?.getAttribute('href') ?? '');
-  const { panel, closeButton, activateInitial } = buildMenuPanel(
-    categories,
-    languages,
-    activeLang.shortLabel,
-    ctaAnchor?.textContent?.trim() ?? '',
-    ctaAnchor?.getAttribute('href') ?? '',
-    logo,
-  );
+  const { panel, activateInitial } = buildMenuPanel(categories, languages, activeLang.shortLabel);
 
   const closeMenu = () => {
     const hadFocusInPanel = panel.contains(document.activeElement);
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
     menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', 'Open navigation menu');
     document.body.style.overflow = '';
     if (hadFocusInPanel) menuToggle.focus();
   };
@@ -501,15 +475,15 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     panel.classList.add('is-open');
     panel.setAttribute('aria-hidden', 'false');
     menuToggle.setAttribute('aria-expanded', 'true');
+    menuToggle.setAttribute('aria-label', 'Close navigation menu');
     document.body.style.overflow = 'hidden';
-    closeButton.focus();
+    panel.focus();
   };
 
   menuToggle.addEventListener('click', () => {
     if (panel.classList.contains('is-open')) closeMenu();
     else openMenu();
   });
-  closeButton.addEventListener('click', closeMenu);
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeMenu();
   });

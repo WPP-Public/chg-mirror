@@ -22,9 +22,9 @@ body:has(.hero-banner) header:has(.header[data-block-status='loaded']) {
     transition: opacity 0.2s ease;
 }
 
-.header-inner,
-.header-menu-top {
+.header-inner {
     position: relative;
+    z-index: 2;
     display: grid;
     grid-template-columns: 80px 1fr 80px;
     align-items: start;
@@ -33,7 +33,6 @@ body:has(.hero-banner) header:has(.header[data-block-status='loaded']) {
 }
 
 .header-menu-toggle,
-.header-menu-close,
 .header-lang-trigger,
 .header-menu-category-trigger {
     color: var(--site-header-text);
@@ -126,8 +125,7 @@ body:has(.hero-banner) header:has(.header[data-block-status='loaded']) {
     letter-spacing: 2px;
 }
 
-.header-tools,
-.header-menu-tools {
+.header-tools {
     display: flex;
     align-items: start;
     justify-content: flex-end;
@@ -228,9 +226,11 @@ header .header-cta {
 
 .header-menu-panel {
     position: fixed;
-    inset: 0;
-    z-index: 101;
-    min-height: 100dvh;
+    top: var(--site-header-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
     overflow-y: auto;
     background: var(--site-header-surface);
     color: var(--site-header-text);
@@ -250,23 +250,6 @@ header .header-cta {
     transition:
         opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
         transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.header-menu-close {
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    justify-self: start;
-    min-height: 40px;
-    font-family: var(--type-font-family-body, sans-serif);
-    font-size: var(--typography-fontsize-body-s, 14px);
-    line-height: var(--typography-line-height-body-sm, 16px);
-    text-transform: uppercase;
-}
-
-.header-menu-close span:first-child {
-    font-size: 22px;
-    line-height: 1;
 }
 
 .header-menu-body {
@@ -387,21 +370,13 @@ button.header-menu-category-trigger::after {
     padding-top: 24px;
 }
 
-/* Mobile: the panel's own top-tools language switcher is replaced by the
-   bottom one (see .header-menu-bottom-lang below); re-shown at tablet+ */
-.header-menu-top .header-menu-tools .header-lang {
-    display: none;
-}
-
-/* Tablet (>=768px): rail + content side by side, promo visible above content */
 @media (min-width: 768px) {
     header {
         --site-header-height: 137px;
         --site-header-inline: 40px;
     }
 
-    .header-inner,
-    .header-menu-top {
+    .header-inner {
         grid-template-columns: 160px 1fr 160px;
         padding-top: 40px;
     }
@@ -430,16 +405,11 @@ button.header-menu-category-trigger::after {
         letter-spacing: 4px;
     }
 
-    .header-tools,
-    .header-menu-tools {
+    .header-tools {
         gap: 32px;
     }
 
     .header-inner > .header-tools .header-lang {
-        display: block;
-    }
-
-    .header-menu-top .header-menu-tools .header-lang {
         display: block;
     }
 
@@ -515,8 +485,7 @@ button.header-menu-category-trigger::after {
 
 /* Desktop (>=1200px): three explicit columns, matching Figma */
 @media (min-width: 1200px) {
-    .header-inner,
-    .header-menu-top {
+    .header-inner {
         grid-template-columns: 250px 1fr 250px;
         padding: 40px var(--site-header-inline) 0;
     }
