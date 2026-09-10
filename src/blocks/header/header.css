@@ -2,7 +2,7 @@ header {
     --site-header-height: 88px;
     --site-header-inline: 20px;
     --site-header-text: var(--color-text-action-default, #1b364b);
-    --site-header-surface: #fbf8f8;
+    --site-header-surface: var(--color-surface-primary-default, #fff);
 
     position: sticky;
     top: 0;
