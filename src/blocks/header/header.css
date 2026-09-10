@@ -439,9 +439,9 @@ button.header-menu-category-trigger::after {
     }
 
     .header-menu-category-trigger {
-        min-height: 70px;
         align-items: flex-start;
-        padding-top: 1.5px;
+        padding: 1.5px 0 24px;
+        margin-bottom: 24px;
         border-bottom: 1px solid var(--color-stroke-main-primary, #898987);
         font-size: var(--typography-fontsize-body-m, 18px);
     }
