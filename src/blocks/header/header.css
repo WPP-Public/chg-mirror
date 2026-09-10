@@ -140,6 +140,7 @@ body:has(.hero-banner) header:has(.header[data-block-status='loaded']) {
 
 .header-lang {
     position: relative;
+    flex-shrink: 0;
 }
 
 .header-lang-trigger {
@@ -209,6 +210,7 @@ body:has(.hero-banner) header:has(.header[data-block-status='loaded']) {
 
 header .header-cta {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     min-width: 72px;
@@ -221,6 +223,7 @@ header .header-cta {
     line-height: var(--typography-line-height-body-sm, 16px);
     text-transform: uppercase;
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .header-menu-panel {
