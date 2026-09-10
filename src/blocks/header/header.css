@@ -2,13 +2,20 @@ header {
     --site-header-height: 88px;
     --site-header-inline: 20px;
     --site-header-text: var(--color-text-action-default, #1b364b);
-    --site-header-surface: var(--color-surface-primary-default, #fff);
+    --site-header-surface: var(--color-surface-general-subtle, #f9f6f6);
 
     position: sticky;
     top: 0;
     z-index: 100;
     height: var(--site-header-height);
     background: var(--color-surface-primary-default, #fff);
+    transition: background-color 0.3s ease;
+}
+
+/* Figma's open-menu overlay uses a subtle cream surface for the whole panel,
+   including the persistent top bar it sits under — not just the body below it */
+header:has(.header-menu-panel.is-open) {
+    background: var(--site-header-surface);
 }
 
 body:has(.hero-banner) header {
@@ -482,6 +489,10 @@ button.header-menu-category-trigger::after {
 
 /* Desktop (>=1200px): three explicit columns, matching Figma */
 @media (min-width: 1200px) {
+    header {
+        --site-header-inline: 80px;
+    }
+
     .header-inner {
         grid-template-columns: 250px 1fr 250px;
         padding: 40px var(--site-header-inline) 0;
@@ -499,7 +510,7 @@ button.header-menu-category-trigger::after {
 
     .header-menu-category-content {
         left: calc(305px + 64px);
-        right: calc(240px + 64px);
+        right: calc(240px + 85px);
     }
 
     .header-menu-promo {
