@@ -434,7 +434,7 @@ button.header-menu-category-trigger::after {
 
     .header-menu-body {
         display: grid;
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 280px 1fr 200px;
         column-gap: 48px;
         padding: 48px var(--site-header-inline) 80px;
         align-items: start;
@@ -467,12 +467,11 @@ button.header-menu-category-trigger::after {
     }
 
     .header-menu-promo {
-        grid-column: 2;
-        grid-row: 1;
-        justify-self: end;
+        grid-column: 3;
+        grid-row: 1 / -1;
+        align-self: start;
         width: 200px;
         margin-top: 0;
-        margin-bottom: 32px;
     }
 
     .header-menu-promo img {

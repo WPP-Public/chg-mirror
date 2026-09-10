@@ -27,8 +27,7 @@ interface NavRegion {
 }
 
 interface NavPromo {
-  imageSrc: string;
-  imageAlt: string;
+  picture: Element | null;
   ctaLabel: string;
   ctaHref: string;
 }
@@ -92,11 +91,10 @@ function readRegions(categoryRoot: Element): NavRegion[] {
 function readPromo(categoryRoot: Element): NavPromo | null {
   const promoRoot = categoryRoot.querySelector(':scope > .nav-category-promo');
   if (!promoRoot) return null;
-  const image = promoRoot.querySelector('img');
+  const picture = categoryRoot.querySelector(':scope > .nav-category-promo picture');
   const cta = promoRoot.querySelector<HTMLAnchorElement>('.nav-category-promo-cta');
   return {
-    imageSrc: image?.getAttribute('src') ?? '',
-    imageAlt: image?.getAttribute('alt') ?? '',
+    picture,
     ctaLabel: cta?.textContent?.trim() ?? '',
     ctaHref: cta?.getAttribute('href') ?? '',
   };
@@ -120,7 +118,11 @@ function getActiveLang(languages: NavLanguage[]): NavLanguage {
     href: `${getFragmentBasePath()}/`,
     source: document.createElement('li'),
   };
-  return languages.find((lang) => currentPath.startsWith(lang.href)) ?? languages[0] ?? fallback;
+  return (
+    languages.find((lang) => currentPath === lang.href || currentPath.startsWith(`${lang.href}/`)) ??
+    languages[0] ??
+    fallback
+  );
 }
 
 function closeLangDropdown(trigger: HTMLElement, dropdown: HTMLElement): void {
@@ -276,44 +278,51 @@ function buildCategoryContent(category: NavCategory): HTMLDivElement {
 
 function setActiveCategory(
   categories: { category: NavCategory; li: HTMLLIElement; content: HTMLDivElement; trigger: HTMLElement }[],
-  promo: { image: HTMLImageElement; cta: HTMLAnchorElement; root: HTMLDivElement },
+  promo: { imageContainer: HTMLDivElement; cta: HTMLAnchorElement; root: HTMLDivElement },
   index: number,
 ): void {
   categories.forEach(({ li, content, trigger }, i) => {
     const isActive = i === index;
     li.dataset.active = String(isActive);
     content.hidden = !isActive;
-    trigger.setAttribute('aria-expanded', String(isActive));
+    if (trigger.tagName === 'BUTTON') trigger.setAttribute('aria-expanded', String(isActive));
   });
 
   const active = categories[index]?.category.promo;
   promo.root.hidden = !active;
   if (active) {
-    promo.image.src = active.imageSrc;
-    promo.image.alt = active.imageAlt;
+    promo.imageContainer.replaceChildren();
+    if (active.picture) {
+      const picture = active.picture.cloneNode(true) as Element;
+      const img = picture.querySelector('img');
+      if (img && !img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
+      promo.imageContainer.append(picture);
+    }
     promo.cta.href = active.ctaHref;
     promo.cta.textContent = active.ctaLabel;
     promo.cta.hidden = !(active.ctaHref && active.ctaLabel);
   }
 }
 
-function buildMenuPromo(): { root: HTMLDivElement; image: HTMLImageElement; cta: HTMLAnchorElement } {
+function buildMenuPromo(): { root: HTMLDivElement; imageContainer: HTMLDivElement; cta: HTMLAnchorElement } {
   const root = document.createElement('div');
   root.className = 'header-menu-promo';
   root.hidden = true;
 
-  const image = document.createElement('img');
+  const imageContainer = document.createElement('div');
+  imageContainer.className = 'header-menu-promo-image';
+
   const cta = document.createElement('a');
   cta.className = 'header-menu-promo-cta';
   cta.dataset.testid = 'header-menu-promo-cta';
 
-  root.append(image, cta);
-  return { root, image, cta };
+  root.append(imageContainer, cta);
+  return { root, imageContainer, cta };
 }
 
 function buildMenuCategories(
   categories: NavCategory[],
-  promo: { root: HTMLDivElement; image: HTMLImageElement; cta: HTMLAnchorElement },
+  promo: { root: HTMLDivElement; imageContainer: HTMLDivElement; cta: HTMLAnchorElement },
 ): HTMLUListElement {
   const list = document.createElement('ul');
   list.className = 'header-menu-categories';
@@ -462,10 +471,12 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   );
 
   const closeMenu = () => {
+    const hadFocusInPanel = panel.contains(document.activeElement);
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
     menuToggle.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+    if (hadFocusInPanel) menuToggle.focus();
   };
 
   const openMenu = () => {
@@ -473,6 +484,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     panel.setAttribute('aria-hidden', 'false');
     menuToggle.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
+    closeButton.focus();
   };
 
   menuToggle.addEventListener('click', () => {

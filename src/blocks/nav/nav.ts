@@ -32,14 +32,18 @@ function itemsOf(scope: Element, model: string): Element[] {
     .filter((el): el is Element => !!el);
 }
 
-function buildLink(item: Element): HTMLLIElement {
+function buildLink(item: Element): HTMLLIElement | null {
+  const label = textOf(item, 'label');
+  const href = linkOf(item, 'link');
+  if (!label || !href) return null;
+
   const li = document.createElement('li');
   li.className = 'nav-link';
   moveInstrumentation(item, li);
 
   const anchor = document.createElement('a');
-  anchor.href = linkOf(item, 'link') || '#';
-  anchor.append(document.createTextNode(textOf(item, 'label')));
+  anchor.href = href;
+  anchor.append(document.createTextNode(label));
 
   const note = textOf(item, 'note');
   if (note) {
@@ -68,7 +72,10 @@ function buildRegion(item: Element): HTMLLIElement {
 
   const links = document.createElement('ul');
   links.className = 'nav-links';
-  itemsOf(item, 'nav-link').forEach((linkItem) => links.append(buildLink(linkItem)));
+  itemsOf(item, 'nav-link').forEach((linkItem) => {
+    const link = buildLink(linkItem);
+    if (link) links.append(link);
+  });
   li.append(links);
   return li;
 }
@@ -81,7 +88,14 @@ function buildCategoryPromo(item: Element): HTMLDivElement | null {
 
   const promo = document.createElement('div');
   promo.className = 'nav-category-promo';
-  if (picture) promo.append(picture.cloneNode(true));
+  if (picture) {
+    const clonedPicture = picture.cloneNode(true) as Element;
+    const clonedImg = clonedPicture.querySelector('img');
+    if (clonedImg && !clonedImg.getAttribute('alt')) {
+      clonedImg.setAttribute('alt', textOf(item, 'promoImageAlt'));
+    }
+    promo.append(clonedPicture);
+  }
   if (ctaHref && ctaLabel) {
     const cta = document.createElement('a');
     cta.className = 'nav-category-promo-cta';
