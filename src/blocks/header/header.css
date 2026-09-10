@@ -313,7 +313,7 @@ button.header-menu-category-trigger::after {
 }
 
 .header-menu-region + .header-menu-region {
-    margin-top: 24px;
+    margin-top: 32px;
 }
 
 .header-menu-region-label {
@@ -380,7 +380,7 @@ button.header-menu-category-trigger::after {
 @media (min-width: 768px) {
     header {
         --site-header-height: 137px;
-        --site-header-inline: 40px;
+        --site-header-inline: 48px;
     }
 
     .header-inner {
@@ -425,13 +425,57 @@ button.header-menu-category-trigger::after {
         padding: 0 24px;
     }
 
+    /* Tablet keeps the mobile accordion pattern (one category expands inline
+       at a time, chevron visible) and adds a fixed promo column beside it —
+       it is not a scaled-down desktop rail, per Figma node 6173:9522 */
     .header-menu-body {
-        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 240px;
+        column-gap: 40px;
+        align-items: start;
         padding: 48px var(--site-header-inline) 80px;
     }
 
+    .header-menu-promo {
+        margin-top: 0;
+    }
+
+    .header-menu-promo img {
+        max-width: 240px;
+        aspect-ratio: 240 / 300;
+    }
+
+    .header-menu-link-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px 48px;
+    }
+
+    .header-menu-bottom-lang {
+        display: none;
+    }
+}
+
+/* Desktop (>=1200px): rail + independent side panel, matching Figma node 4072:1805 */
+@media (min-width: 1200px) {
+    header {
+        --site-header-inline: 80px;
+    }
+
+    .header-inner {
+        grid-template-columns: 250px 1fr 250px;
+        padding: 40px var(--site-header-inline) 0;
+    }
+
+    .header-menu-body {
+        display: block;
+        position: relative;
+        padding: 48px var(--site-header-inline) 80px;
+        max-width: 1440px;
+        margin-inline: auto;
+    }
+
     .header-menu-categories {
-        width: 280px;
+        width: 305px;
     }
 
     .header-menu-category {
@@ -453,8 +497,8 @@ button.header-menu-category-trigger::after {
     .header-menu-category-content {
         position: absolute;
         top: 48px;
-        left: calc(var(--site-header-inline) + 280px + 48px);
-        right: calc(var(--site-header-inline) + 200px + 48px);
+        left: calc(var(--site-header-inline) + 305px + 64px);
+        right: calc(var(--site-header-inline) + 240px + 85px);
         padding-bottom: 0;
     }
 
@@ -462,60 +506,6 @@ button.header-menu-category-trigger::after {
         position: absolute;
         top: 48px;
         right: var(--site-header-inline);
-        width: 200px;
-        margin-top: 0;
-    }
-
-    .header-menu-promo img {
-        max-width: 200px;
-        aspect-ratio: 200 / 250;
-    }
-
-    .header-menu-link-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .header-menu-bottom-lang {
-        display: none;
-    }
-}
-
-/* Narrow tablet (768px-899px): the content column shrinks to ~112-243px here,
-   too tight for two-column link text (labels overlap); stack single-column
-   until there's room again at 900px+ */
-@media (min-width: 768px) and (max-width: 899px) {
-    .header-menu-link-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
-}
-
-/* Desktop (>=1200px): three explicit columns, matching Figma */
-@media (min-width: 1200px) {
-    header {
-        --site-header-inline: 80px;
-    }
-
-    .header-inner {
-        grid-template-columns: 250px 1fr 250px;
-        padding: 40px var(--site-header-inline) 0;
-    }
-
-    .header-menu-body {
-        padding: 48px var(--site-header-inline) 80px;
-        max-width: 1440px;
-        margin-inline: auto;
-    }
-
-    .header-menu-categories {
-        width: 305px;
-    }
-
-    .header-menu-category-content {
-        left: calc(var(--site-header-inline) + 305px + 64px);
-        right: calc(var(--site-header-inline) + 240px + 85px);
-    }
-
-    .header-menu-promo {
         width: 240px;
         margin: 0;
     }
