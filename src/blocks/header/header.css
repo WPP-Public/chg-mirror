@@ -4,12 +4,10 @@ header {
     --site-header-text: var(--color-text-action-default, #1b364b);
     --site-header-surface: var(--color-surface-general-subtle, #f9f6f6);
 
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 100;
-
-    /* override the boilerplate's fixed header{height:var(--nav-height)} reservation —
-       the box must grow to include the in-flow menu panel while it's open */
-    height: auto;
+    height: var(--site-header-height);
     background: var(--color-surface-primary-default, #fff);
     transition: background-color 0.3s ease;
 }
@@ -32,15 +30,13 @@ body:has(.hero-banner) header:has(.header[data-block-status='loaded']) {
 }
 
 .header-inner {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 2;
     display: grid;
     grid-template-columns: 80px 1fr 80px;
     align-items: start;
     min-height: var(--site-header-height);
     padding: 24px var(--site-header-inline) 0;
-    background: inherit;
 }
 
 .header-menu-toggle,
@@ -236,8 +232,13 @@ header .header-cta {
 }
 
 .header-menu-panel {
-    overflow: hidden;
-    max-height: 0;
+    position: fixed;
+    top: var(--site-header-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    overflow-y: auto;
     background: var(--site-header-surface);
     color: var(--site-header-text);
     opacity: 0;
@@ -246,20 +247,16 @@ header .header-cta {
     transition:
         opacity 0.2s ease,
         transform 0.2s ease,
-        max-height 0.2s ease,
         visibility 0s 0.2s;
 }
 
 .header-menu-panel.is-open {
-    max-height: 4000px;
-    min-height: calc(100dvh - var(--site-header-height));
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
     transition:
         opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-        max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .header-menu-body {
