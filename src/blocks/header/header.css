@@ -544,6 +544,22 @@ button.header-menu-category-trigger::after {
         top: 48px;
         left: calc(var(--site-header-inline) + 305px + 64px);
         right: calc(var(--site-header-inline) + 240px + 85px);
+        /* Rail + fixed side panel, not an accordion: every category's content shares this same
+           absolute box, so animating height (as mobile/tablet do) would show the outgoing and
+           incoming category's regions overlapping mid-transition. Cross-fade instead. */
+        display: block;
+        grid-template-rows: unset;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            opacity 0.2s ease,
+            visibility 0s 0.2s;
+    }
+
+    .header-menu-category-content[data-expanded='true'] {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.2s ease;
     }
 
     .header-menu-category-content-inner {
