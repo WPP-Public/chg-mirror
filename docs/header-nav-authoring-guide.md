@@ -1,64 +1,56 @@
 # Header Nav — Authoring Guide
 
 > **Audience:** Content authors
-> **Block:** `nav`
 > **Source document:** `/nav` (per site/language, e.g. `/global/en/nav`)
-
----
 
 ## 1. Overview
 
-Site navigation is authored with the **Nav** component in the Universal Editor, placed
-once on the `/nav` fragment page for each site/language. Unlike a generic content page,
-you build the menu entirely from structured fields and nested components — no manual
-list/markup editing is required or possible.
+Site header content (logo, language switcher, Book CTA, and the mega-menu) is authored
+on the shared `/nav` page for each site/language, using standard page components —
+there is no dedicated "Nav" component. The page must have exactly two sections, in order.
 
-## 2. Component Tree
+## 2. Section 1 — Header bar
 
-Add exactly one **Nav** component to the `/nav` page, then build its children:
+Add, in any order:
 
-```
-Nav
- ├─ Logo Image, Logo Alt Text
- ├─ Book Button Label, Book Button Link
- ├─ Nav Language (add one per language)
- │    ├─ Language Label       e.g. "English"
- │    ├─ Short Label          e.g. "EN" (shown as the collapsed switcher label)
- │    └─ Link
- └─ Nav Category (add one per top-level menu item)
-      ├─ Category Label
-      ├─ Direct Link          (only fill in if this category has NO Nav Region children —
-      │                        makes it a plain link with no expandable content)
-      ├─ Promo Image / Alt Text
-      ├─ Promo CTA Label / Link
-      └─ Nav Region (optional — add one or more to group links, e.g. "ASIA PACIFIC")
-           ├─ Region Label     (optional — leave blank for an unlabeled group)
-           └─ Nav Link (add one per destination/link)
-                ├─ Link Label
-                ├─ Link
-                └─ Note         (optional, e.g. "(2026)")
-```
+- **Image** — the logo. Set the alt text on the image itself.
+- **Text** — the language switcher. Add one bullet list with a single top-level item
+  (its text is not shown), and a nested bullet list underneath it with one linked item
+  per language, e.g.:
+  - English
+    - [English](/global/en)
+    - [简体中文](/global/zh-cn)
+    - [日本語](/global/jp)
+- **Button** — the "Book Your Stay" CTA (label + link).
 
-Add/remove/reorder items using the "+" control at the level you want to change — a new
-category, a new region inside a category, or a new link inside a region.
+## 3. Section 2 — Menu
 
-## 3. Rules
+Add one **Text** component per top-level menu category, each followed immediately by one
+**Hero** block for that category's promo image (skip the Hero if a category has no promo).
 
-- **Order does not matter.** Nav Language and Nav Category items are recognized by type,
-  not by their position in the tree — you can freely reorder categories or languages.
-- **A category with no Nav Region children is a plain link.** Fill in its "Direct Link"
-  field; it renders in the menu rail without expandable content.
-- **A category with one or more Nav Region children is expandable.** Its regions render as
-  labeled groups of links in the menu; leave a region's "Region Label" blank for an
-  unlabeled group of links.
-- **Promo fields are optional per category.** Leave them blank to hide the promo
-  image/CTA for that category.
-- Every Nav Link needs both a Link Label and a Link — links without both are skipped.
+Each category's Text component is a single bullet list with one top-level item (the
+category label) containing a nested list:
 
-## 4. Pre-publish Checklist
+- Give a nested item its own nested sub-list to make it a **labeled group** (e.g. "Asia
+  Pacific" with destinations underneath).
+- Give a nested item **no** sub-list to make it a **plain link** directly under the
+  category (no group heading) — link it or leave it as plain text.
+- A category with **no nested list at all** — just a linked category label — becomes a
+  plain top-level link with no expandable menu.
+- An item can be plain text with no link — it renders as a non-clickable, dimmed entry
+  (useful for "coming soon" destinations).
 
-- [ ] At least one Nav Language exists (used for the language switcher)
-- [ ] At least one Nav Category exists
-- [ ] Each category is either: (a) a Direct Link, or (b) has ≥1 Nav Region with ≥1 Nav
-      Link each
-- [ ] Logo Image and Book Button fields are filled in on the Nav component itself
+## 4. Rules
+
+- **Order matters within each section.** A Hero block is matched to the Text component
+  immediately before it — don't separate them with anything else.
+- **Exactly two sections, in that order.** The first section is always the header bar,
+  the second is always the menu.
+- **Every category needs at least one link** (either the category itself linked, or at
+  least one linked item underneath it) or it won't render.
+
+## 5. Pre-publish Checklist
+
+- [ ] Section 1 has exactly one Image, one language Text list, and one Button
+- [ ] Section 2 has at least one category Text component with at least one working link
+- [ ] Each Hero block for a promo image comes directly after its category's Text component
