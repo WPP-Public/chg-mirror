@@ -16,7 +16,6 @@ interface NavLanguage {
 interface NavLink {
   label: string;
   href: string;
-  note: string;
   source: Element;
 }
 
@@ -54,45 +53,82 @@ function getFragmentBasePath(): string {
   return parts.length ? `/${parts.join('/')}` : '';
 }
 
-function readLanguages(navRoot: Element): NavLanguage[] {
-  return [...navRoot.querySelectorAll(':scope > .nav-languages > .nav-language')].map((item) => {
+function directText(el: Element): string {
+  return [...el.childNodes]
+    .filter((node) => node.nodeType === Node.TEXT_NODE)
+    .map((node) => node.textContent ?? '')
+    .join(' ')
+    .trim();
+}
+
+function readLanguages(chromeSection: Element): NavLanguage[] {
+  const outerItem = chromeSection.querySelector(':scope .default-content-wrapper > ul > li');
+  const innerList = outerItem?.querySelector(':scope > ul');
+  if (!innerList) return [];
+  return [...innerList.children].map((item) => {
     const anchor = item.querySelector('a');
     const label = anchor?.textContent?.trim() ?? '';
     return {
       label,
-      shortLabel: anchor?.dataset.shortLabel || label.slice(0, 2).toUpperCase(),
+      shortLabel: label.slice(0, 2).toUpperCase(),
       href: anchor?.getAttribute('href') ?? '#',
       source: item,
     };
   });
 }
 
-function readLinks(regionRoot: Element): NavLink[] {
-  return [...regionRoot.querySelectorAll(':scope > .nav-links > .nav-link')].map((item) => {
-    const anchor = item.querySelector('a');
-    const note = anchor?.querySelector('.nav-link-note');
-    return {
-      label: anchor?.childNodes[0]?.textContent?.trim() ?? anchor?.textContent?.trim() ?? '',
-      href: anchor?.getAttribute('href') ?? '#',
-      note: note?.textContent?.trim() ?? '',
-      source: item,
-    };
-  });
-}
-
-function readRegions(categoryRoot: Element): NavRegion[] {
-  return [...categoryRoot.querySelectorAll(':scope > .nav-regions > .nav-region')].map((item) => ({
-    label: item.querySelector(':scope > .nav-region-label')?.textContent?.trim() ?? '',
-    links: readLinks(item),
+function readLinkItem(item: Element): NavLink {
+  const anchor = item.querySelector<HTMLAnchorElement>('a');
+  return {
+    label: anchor?.textContent?.trim() || directText(item),
+    href: anchor?.getAttribute('href') ?? '',
     source: item,
-  }));
+  };
 }
 
-function readPromo(categoryRoot: Element): NavPromo | null {
-  const promoRoot = categoryRoot.querySelector(':scope > .nav-category-promo');
-  if (!promoRoot) return null;
-  const picture = categoryRoot.querySelector(':scope > .nav-category-promo picture');
-  const cta = promoRoot.querySelector<HTMLAnchorElement>('.nav-category-promo-cta');
+// A <li> with its own nested <ul> is a labeled region; a <li> with no nested <ul> is a
+// flat link directly under the category. Consecutive flat links are grouped into one
+// unlabeled region so they still render through the existing region-based UI.
+function readCategoryRegions(topItem: Element): NavRegion[] {
+  const nestedList = topItem.querySelector(':scope > ul');
+  if (!nestedList) return [];
+  const regions: NavRegion[] = [];
+  let flatLinks: NavLink[] = [];
+  const flushFlatLinks = () => {
+    if (flatLinks.length) {
+      regions.push({ label: '', links: flatLinks, source: nestedList });
+      flatLinks = [];
+    }
+  };
+  [...nestedList.children].forEach((item) => {
+    const childList = item.querySelector(':scope > ul');
+    if (childList) {
+      flushFlatLinks();
+      regions.push({
+        label: directText(item),
+        links: [...childList.children].map((linkItem) => readLinkItem(linkItem)),
+        source: item,
+      });
+    } else {
+      flatLinks.push(readLinkItem(item));
+    }
+  });
+  flushFlatLinks();
+  return regions;
+}
+
+function readPromo(heroBlock: Element): NavPromo | null {
+  const picture = heroBlock.querySelector('picture');
+  const cta = heroBlock.querySelector<HTMLAnchorElement>('a');
+  if (!picture && !cta) return null;
+  const img = picture?.querySelector('img');
+  const src = img?.getAttribute('src');
+  // Defer the promo image request until its category is actually shown (see
+  // setActiveCategory, which restores src from data-src only for the active category).
+  if (img && src) {
+    img.removeAttribute('src');
+    img.dataset.src = src;
+  }
   return {
     picture,
     ctaLabel: cta?.textContent?.trim() ?? '',
@@ -100,14 +136,30 @@ function readPromo(categoryRoot: Element): NavPromo | null {
   };
 }
 
-function readCategories(navRoot: Element): NavCategory[] {
-  return [...navRoot.querySelectorAll(':scope > .nav-categories > .nav-category')].map((item) => ({
-    label: item.querySelector(':scope > .nav-category-label')?.textContent?.trim() ?? '',
-    href: (item as HTMLElement).dataset.link ?? '',
-    regions: readRegions(item),
-    promo: readPromo(item),
-    source: item,
-  }));
+function readCategories(menuSection: Element): NavCategory[] {
+  const categories: NavCategory[] = [];
+  [...menuSection.children].forEach((wrapper) => {
+    const rootList = wrapper.querySelector(':scope > ul');
+    if (rootList) {
+      const topItem = rootList.querySelector(':scope > li');
+      if (!topItem) return;
+      const anchor = topItem.querySelector<HTMLAnchorElement>(':scope > a');
+      categories.push({
+        label: anchor?.textContent?.trim() || directText(topItem),
+        href: anchor?.getAttribute('href') ?? '',
+        regions: readCategoryRegions(topItem),
+        promo: null,
+        source: topItem,
+      });
+      return;
+    }
+    const heroBlock = wrapper.querySelector(':scope > div.hero');
+    const lastCategory = categories[categories.length - 1];
+    if (heroBlock && lastCategory && !lastCategory.promo) {
+      lastCategory.promo = readPromo(heroBlock);
+    }
+  });
+  return categories.filter((category) => category.href || category.regions.some((region) => region.links.length));
 }
 
 function getActiveLang(languages: NavLanguage[]): NavLanguage {
@@ -245,11 +297,19 @@ function buildLinkGrid(links: NavLink[]): HTMLUListElement {
   grid.className = 'header-menu-link-grid';
   links.forEach((link) => {
     const li = document.createElement('li');
-    const anchor = document.createElement('a');
-    anchor.href = link.href;
-    anchor.textContent = link.note ? `${link.label} ${link.note}` : link.label;
-    moveInstrumentation(link.source, anchor);
-    li.append(anchor);
+    if (link.href) {
+      const anchor = document.createElement('a');
+      anchor.href = link.href;
+      anchor.textContent = link.label;
+      moveInstrumentation(link.source, anchor);
+      li.append(anchor);
+    } else {
+      const span = document.createElement('span');
+      span.className = 'nav-link is-disabled';
+      span.textContent = link.label;
+      moveInstrumentation(link.source, span);
+      li.append(span);
+    }
     grid.append(li);
   });
   return grid;
@@ -427,30 +487,26 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     return;
   }
 
-  const navRoot = fragment.querySelector('.nav-content');
-  if (!navRoot) {
+  const [chromeSection, menuSection] = fragment.querySelectorAll(':scope > div.section');
+  if (!chromeSection || !menuSection) {
     console.warn('[header] Nav structure invalid. Check /nav document.');
     hide();
     return;
   }
 
-  const languages = readLanguages(navRoot);
-  const categories = readCategories(navRoot);
+  const languages = readLanguages(chromeSection);
+  const categories = readCategories(menuSection);
   if (!languages.length || !categories.length) {
     console.warn('[header] Nav structure invalid. Check /nav document.');
     hide();
     return;
   }
 
-  const logoPicture = navRoot.querySelector('.nav-logo img');
-  const ctaAnchor = navRoot.querySelector<HTMLAnchorElement>(':scope > .nav-cta');
+  const logoImg = chromeSection.querySelector('picture img');
+  const ctaAnchor = chromeSection.querySelector<HTMLAnchorElement>('.default-content-wrapper > p > a');
   const activeLang = getActiveLang(languages);
 
-  const logo = buildLogo(
-    logoPicture?.getAttribute('src') ?? '',
-    logoPicture?.getAttribute('alt') ?? '',
-    activeLang.href,
-  );
+  const logo = buildLogo(logoImg?.getAttribute('src') ?? '', logoImg?.getAttribute('alt') ?? '', activeLang.href);
   const menuToggle = buildMenuToggle();
   const langZone = buildLangZone(languages, activeLang.shortLabel);
   const cta = buildCtaZone(ctaAnchor?.textContent?.trim() ?? '', ctaAnchor?.getAttribute('href') ?? '');
