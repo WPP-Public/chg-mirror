@@ -8,7 +8,7 @@ header {
     top: 0;
     z-index: 100;
     height: var(--site-header-height);
-    background: var(--color-surface-primary-default, #fff);
+    background: transparent;
     transition: background-color 0.3s ease;
 }
 
