@@ -29,8 +29,7 @@
       "filters-grid",
       "offers-carousel",
       "text-with-cta",
-      "rte",
-      "nav"
+      "rte"
     ]
   },
   {
@@ -174,25 +173,6 @@
     "id": "hero-banner-with-toggle",
     "components": [
       "hero-banner-with-toggle-item"
-    ]
-  },
-  {
-    "id": "nav",
-    "components": [
-      "nav-language",
-      "nav-category"
-    ]
-  },
-  {
-    "id": "nav-category",
-    "components": [
-      "nav-region"
-    ]
-  },
-  {
-    "id": "nav-region",
-    "components": [
-      "nav-link"
     ]
   },
   {
