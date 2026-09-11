@@ -442,7 +442,10 @@ function buildMenuCategories(
 
   entries.forEach(({ trigger }, index) => {
     if (trigger.tagName !== 'BUTTON') return;
-    trigger.addEventListener('click', () => setActiveCategory(entries, promo, index));
+    trigger.addEventListener('click', () => {
+      const isActive = entries[index]?.li.dataset.active === 'true';
+      setActiveCategory(entries, promo, isActive ? -1 : index);
+    });
   });
 
   const firstExpandable = entries.findIndex((entry) => entry.category.regions.length);
