@@ -136,20 +136,30 @@ function readPromo(heroBlock: Element): NavPromo | null {
   };
 }
 
+function readCategoryFromList(rootList: Element): NavCategory | null {
+  const topItem = rootList.querySelector(':scope > li');
+  if (!topItem) return null;
+  const anchor = topItem.querySelector<HTMLAnchorElement>(':scope > a');
+  return {
+    label: anchor?.textContent?.trim() || directText(topItem),
+    href: anchor?.getAttribute('href') ?? '',
+    regions: readCategoryRegions(topItem),
+    promo: null,
+    source: topItem,
+  };
+}
+
 function readCategories(menuSection: Element): NavCategory[] {
   const categories: NavCategory[] = [];
   [...menuSection.children].forEach((wrapper) => {
-    const rootList = wrapper.querySelector(':scope > ul');
-    if (rootList) {
-      const topItem = rootList.querySelector(':scope > li');
-      if (!topItem) return;
-      const anchor = topItem.querySelector<HTMLAnchorElement>(':scope > a');
-      categories.push({
-        label: anchor?.textContent?.trim() || directText(topItem),
-        href: anchor?.getAttribute('href') ?? '',
-        regions: readCategoryRegions(topItem),
-        promo: null,
-        source: topItem,
+    // decorateSections groups consecutive default content into ONE wrapper, so two
+    // category lists with no Hero between them (a category with no promo) share a
+    // wrapper — read every top-level <ul>, not just the first.
+    const rootLists = [...wrapper.querySelectorAll(':scope > ul')];
+    if (rootLists.length) {
+      rootLists.forEach((rootList) => {
+        const category = readCategoryFromList(rootList);
+        if (category) categories.push(category);
       });
       return;
     }
@@ -357,7 +367,7 @@ function setActiveCategory(
       const img = picture.querySelector('img');
       if (img) {
         if (!img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
-        // restore the src that nav.ts deferred to data-src, now that this category is actually shown
+        // restore the src that readPromo deferred to data-src, now that this category is actually shown
         const dataSrc = img.dataset.src;
         if (dataSrc) {
           img.src = dataSrc;

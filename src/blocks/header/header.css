@@ -349,8 +349,7 @@ button.header-menu-category-trigger::after {
 }
 
 .header-menu-link-grid .nav-link.is-disabled {
-    color: var(--site-header-text);
-    opacity: 0.4;
+    color: var(--color-text-main-disabled, #6e6e6c);
     font-family: var(--type-font-family-heading, serif);
     font-size: var(--typography-fontsize-body-text-link, 16px);
     line-height: 24px;
