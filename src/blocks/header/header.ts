@@ -328,7 +328,10 @@ function buildLinkGrid(links: NavLink[]): HTMLUListElement {
 function buildCategoryContent(category: NavCategory): HTMLDivElement {
   const content = document.createElement('div');
   content.className = 'header-menu-category-content';
-  content.hidden = true;
+  content.inert = true;
+
+  const inner = document.createElement('div');
+  inner.className = 'header-menu-category-content-inner';
 
   category.regions.forEach((region) => {
     const regionEl = document.createElement('div');
@@ -340,11 +343,15 @@ function buildCategoryContent(category: NavCategory): HTMLDivElement {
       regionEl.append(heading);
     }
     regionEl.append(buildLinkGrid(region.links));
-    content.append(regionEl);
+    inner.append(regionEl);
   });
 
+  content.append(inner);
   return content;
 }
+
+// Matches the .header-menu-promo-image/-cta opacity transition duration in header.css.
+const PROMO_SWAP_MS = 150;
 
 function setActiveCategory(
   categories: { category: NavCategory; li: HTMLLIElement; content: HTMLDivElement; trigger: HTMLElement }[],
@@ -354,13 +361,18 @@ function setActiveCategory(
   categories.forEach(({ li, content, trigger }, i) => {
     const isActive = i === index;
     li.dataset.active = String(isActive);
-    content.hidden = !isActive;
+    content.dataset.expanded = String(isActive);
+    content.inert = !isActive;
     if (trigger.tagName === 'BUTTON') trigger.setAttribute('aria-expanded', String(isActive));
   });
 
   const active = categories[index]?.category.promo;
-  promo.root.hidden = !active;
-  if (active) {
+  if (!active) {
+    promo.root.classList.remove('is-visible');
+    return;
+  }
+
+  const applyPromo = () => {
     promo.imageContainer.replaceChildren();
     if (active.picture) {
       const picture = active.picture.cloneNode(true) as Element;
@@ -379,13 +391,23 @@ function setActiveCategory(
     promo.cta.href = active.ctaHref;
     promo.cta.textContent = active.ctaLabel;
     promo.cta.hidden = !(active.ctaHref && active.ctaLabel);
+    promo.root.classList.remove('is-swapping');
+  };
+
+  const wasVisible = promo.root.classList.contains('is-visible');
+  promo.root.classList.add('is-visible');
+  if (wasVisible) {
+    // Cross-fade: fade the current image/CTA out, swap content, then fade back in.
+    promo.root.classList.add('is-swapping');
+    window.setTimeout(applyPromo, PROMO_SWAP_MS);
+  } else {
+    applyPromo();
   }
 }
 
 function buildMenuPromo(): { root: HTMLDivElement; imageContainer: HTMLDivElement; cta: HTMLAnchorElement } {
   const root = document.createElement('div');
   root.className = 'header-menu-promo';
-  root.hidden = true;
 
   const imageContainer = document.createElement('div');
   imageContainer.className = 'header-menu-promo-image';
