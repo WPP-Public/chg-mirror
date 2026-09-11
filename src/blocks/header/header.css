@@ -9,7 +9,9 @@ header {
     z-index: 100;
     height: var(--site-header-height);
     background: transparent;
-    transition: background-color 0.3s ease;
+    /* Kept in lockstep with .header-menu-panel's clip-path transition below so the
+       header's surface and the panel read as one continuous block, not two effects. */
+    transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Figma's open-menu overlay uses a subtle cream surface for the whole panel,
@@ -241,22 +243,20 @@ header .header-cta {
     overflow-y: auto;
     background: var(--site-header-surface);
     color: var(--site-header-text);
-    opacity: 0;
     visibility: hidden;
-    transform: translateY(-24px);
+    /* Grows down from the header instead of fading/sliding in over the page, so it reads
+       as the header's surface (see header {} above) continuing into the panel, matched
+       to the same duration/easing. */
+    clip-path: inset(0 0 100% 0);
     transition:
-        opacity 0.2s ease,
-        transform 0.2s ease,
-        visibility 0s 0.2s;
+        clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        visibility 0s 0.35s;
 }
 
 .header-menu-panel.is-open {
-    opacity: 1;
     visibility: visible;
-    transform: translateY(0);
-    transition:
-        opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    clip-path: inset(0 0 0% 0);
+    transition: clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .header-menu-body {
