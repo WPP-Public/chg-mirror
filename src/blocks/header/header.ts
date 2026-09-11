@@ -590,10 +590,4 @@ export default async function decorate(block: HTMLElement): Promise<void> {
 
   block.dataset.testid = 'header';
   block.replaceChildren(inner, panel);
-
-  const heroBannerSection = document.querySelector('main > div:has(.hero-banner)');
-  if (heroBannerSection) {
-    const headerElement = block.closest('header');
-    if (headerElement) heroBannerSection.after(headerElement);
-  }
 }

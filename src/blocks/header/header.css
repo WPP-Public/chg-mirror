@@ -20,15 +20,12 @@ header:has(.header-menu-panel.is-open) {
     background: var(--site-header-surface);
 }
 
-body:has(.hero-banner) header {
-    opacity: 0;
-    pointer-events: none;
-}
-
-body:has(.hero-banner) header:has(.header[data-block-status='loaded']) {
-    opacity: 1;
-    pointer-events: auto;
-    transition: opacity 0.2s ease;
+/* A full-bleed hero-banner as the first section should fill the viewport with the
+   header floating transparently on top of it, not pushed below it. position: sticky
+   still reserves its own row in normal flow — cancel that with a matching negative
+   margin so the next section (the hero) starts at the very top, under the header. */
+body:has(main > div:first-child .hero-banner) header {
+    margin-bottom: calc(-1 * var(--site-header-height));
 }
 
 .header-inner {
