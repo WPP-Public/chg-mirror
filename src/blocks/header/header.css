@@ -220,8 +220,8 @@ header .header-cta {
     min-width: 72px;
     height: var(--component-button-height, 40px);
     padding: 0 16px;
-    color: var(--color-text-on-action-default, #fff);
-    background: var(--color-surface-action-default, #1b364b);
+    color: var(--color-text-on-action-inverse-default, #1b364b);
+    background: var(--color-surface-action-inverse-default, #fff);
     font-family: var(--type-font-family-cta, sans-serif);
     font-size: var(--typography-fontsize-body-s, 14px);
     line-height: var(--typography-line-height-body-sm, 16px);
