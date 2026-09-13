@@ -11,7 +11,7 @@ header {
     background: transparent;
     /* Kept in lockstep with .header-menu-panel's clip-path transition below so the
        header's surface and the panel read as one continuous block, not two effects. */
-    transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Figma's open-menu overlay uses a subtle cream surface for the whole panel,
@@ -232,32 +232,42 @@ header .header-cta {
 
 .header-menu-panel {
     position: fixed;
-    top: var(--site-header-height);
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 1;
+    padding-top: var(--site-header-height);
     overflow-y: auto;
     background: var(--site-header-surface);
     color: var(--site-header-text);
     visibility: hidden;
-    /* Grows down from the header instead of fading/sliding in over the page, so it reads
-       as the header's surface (see header {} above) continuing into the panel, matched
-       to the same duration/easing. */
+    /* Grows down from top of the page (slide-in-top) over the header bar and page,
+       with header controls staying on top (z-index: 2). */
     clip-path: inset(0 0 100% 0);
     transition:
-        clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-        visibility 0s 0.35s;
+        clip-path 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s 0.45s;
 }
 
 .header-menu-panel.is-open {
     visibility: visible;
     clip-path: inset(0 0 0% 0);
-    transition: clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: clip-path 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .header-menu-body {
     padding: 32px var(--site-header-inline) 56px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+        opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.header-menu-panel.is-open .header-menu-body {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Mobile (<=767px): true accordion — trigger + content stay stacked in normal flow */
@@ -284,6 +294,7 @@ header .header-cta {
     text-align: start;
     text-transform: uppercase;
     text-decoration: none;
+    transition: color 0.25s ease;
 }
 
 .header-menu-category[data-active='true'] .header-menu-category-trigger,
@@ -298,7 +309,7 @@ button.header-menu-category-trigger::after {
     border: solid currentcolor;
     border-width: 0 1px 1px 0;
     transform: rotate(45deg);
-    transition: transform 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .header-menu-category[data-active='true'] button.header-menu-category-trigger::after {
@@ -308,7 +319,7 @@ button.header-menu-category-trigger::after {
 .header-menu-category-content {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.3s ease;
+    transition: grid-template-rows 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .header-menu-category-content[data-expanded='true'] {
@@ -318,6 +329,16 @@ button.header-menu-category-trigger::after {
 .header-menu-category-content-inner {
     overflow: hidden;
     padding-bottom: 24px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.header-menu-category-content[data-expanded='true'] .header-menu-category-content-inner {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .header-menu-region + .header-menu-region {
@@ -538,15 +559,25 @@ button.header-menu-category-trigger::after {
     }
 
     .header-menu-category {
-        border-bottom: 0;
+        border-bottom: 1px solid var(--color-stroke-main-primary, #898987);
     }
 
     .header-menu-category-trigger {
-        align-items: flex-start;
-        padding: 1.5px 0 24px;
-        margin-bottom: 24px;
-        border-bottom: 1px solid var(--color-stroke-main-primary, #898987);
+        align-items: center;
+        min-height: auto;
+        padding: 24px 0;
+        margin: 0;
+        border-bottom: 0;
         font-size: var(--typography-fontsize-body-m, 18px);
+        line-height: 24px;
+    }
+
+    .header-menu-category:first-child .header-menu-category-trigger {
+        padding-top: 0;
+    }
+
+    .header-menu-region-label {
+        line-height: 24px;
     }
 
     button.header-menu-category-trigger::after {
@@ -560,20 +591,25 @@ button.header-menu-category-trigger::after {
         right: calc(var(--site-header-inline) + 240px + 85px);
         /* Rail + fixed side panel, not an accordion: every category's content shares this same
            absolute box, so animating height (as mobile/tablet do) would show the outgoing and
-           incoming category's regions overlapping mid-transition. Cross-fade instead. */
+           incoming category's regions overlapping mid-transition. Cross-fade + subtle slide instead. */
         display: block;
         grid-template-rows: unset;
         opacity: 0;
         visibility: hidden;
+        transform: translateY(6px);
         transition:
-            opacity 0.2s ease,
-            visibility 0s 0.2s;
+            opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+            visibility 0s 0.35s;
     }
 
     .header-menu-category-content[data-expanded='true'] {
         opacity: 1;
         visibility: visible;
-        transition: opacity 0.2s ease;
+        transform: translateY(0);
+        transition:
+            opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .header-menu-category-content-inner {
