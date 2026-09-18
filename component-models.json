@@ -850,7 +850,7 @@
         "value": ""
       },
       {
-        "component": "text",
+        "component": "richtext",
         "name": "title",
         "label": "Primary Main Title",
         "valueType": "string",
@@ -864,7 +864,7 @@
     "fields": [
       {
         "component": "reference",
-        "name": "media_cardImage",
+        "name": "image",
         "label": "Card Image",
         "valueType": "string",
         "multi": false,
@@ -872,7 +872,7 @@
       },
       {
         "component": "text",
-        "name": "media_cardImageAlt",
+        "name": "imageAlt",
         "label": "Asset Alt Text",
         "valueType": "string",
         "required": true,

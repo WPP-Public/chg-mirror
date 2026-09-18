@@ -73,7 +73,13 @@
     width: 260px;
     height: 300px;
     cursor: pointer;
-    transition: transform 0.35s ease;
+    transition:
+        top 0.35s ease,
+        right 0.35s ease,
+        width 0.35s ease,
+        height 0.35s ease,
+        opacity 0.35s ease,
+        transform 0.35s ease;
 }
 
 .offers-carousel .offers-carousel-card-media {
@@ -269,9 +275,13 @@
         padding: 0;
     }
 
+    .offers-carousel .offers-carousel-eyebrow,
+    .offers-carousel .offers-carousel-title {
+        padding: 0 80px;
+    }
+
     .offers-carousel .offers-carousel-title {
         max-width: 416px;
-        padding: 0 80px;
         font-size: 48px;
         line-height: 48px;
     }
@@ -291,32 +301,31 @@
         height: 448px;
     }
 
-    .offers-carousel .offers-carousel-card.is-next-1 {
-        top: 60px;
+    /* cards are offset by 52px steps, so the widest one must leave 2 steps of room */
+    .offers-carousel .offers-carousel-card.is-active,
+    .offers-carousel .offers-carousel-card.is-next-1,
+    .offers-carousel .offers-carousel-card.is-next-2 {
+        top: 0;
         right: auto;
-        left: 52px;
-        width: 680px;
+        bottom: auto;
+        left: 0;
+        width: min(680px, calc(100% - 104px));
         height: 328px;
         opacity: 1;
         pointer-events: auto;
     }
 
+    /* offsets live on transform so switching state animates instead of jumping */
+    .offers-carousel .offers-carousel-card.is-next-1 {
+        transform: translate(52px, 60px);
+    }
+
     .offers-carousel .offers-carousel-card.is-next-2 {
-        top: 0;
-        right: 0;
-        bottom: auto;
-        left: auto;
-        width: 680px;
-        height: 328px;
-        opacity: 1;
+        transform: translate(104px, 0);
     }
 
     .offers-carousel .offers-carousel-card.is-active {
-        top: 120px;
-        right: auto;
-        left: 0;
-        width: 680px;
-        height: 328px;
+        transform: translate(0, 120px);
     }
 
     .offers-carousel .offers-carousel-card-overlay {
@@ -349,10 +358,11 @@
 }
 
 @media (width < 768px) {
+    /* cards are centred and stepped 30px narrower each, so they must shrink with the stage */
     .offers-carousel .offers-carousel-card.is-active {
         z-index: 4;
         top: 100px;
-        width: 320px;
+        width: min(320px, 100%);
         height: 328px;
         opacity: 1;
         pointer-events: auto;
@@ -362,7 +372,7 @@
     .offers-carousel .offers-carousel-card.is-next-1 {
         z-index: 3;
         top: 50px;
-        width: 290px;
+        width: min(290px, calc(100% - 30px));
         height: 335px;
         opacity: 1;
         pointer-events: auto;
@@ -372,7 +382,7 @@
     .offers-carousel .offers-carousel-card.is-next-2 {
         z-index: 2;
         top: 0;
-        width: 260px;
+        width: min(260px, calc(100% - 60px));
         height: 300px;
         opacity: 1;
         pointer-events: auto;
