@@ -28,11 +28,21 @@ function applyTarget(anchor: HTMLAnchorElement, openInNewTab?: boolean): void {
   anchor.rel = 'noopener noreferrer';
 }
 
-function appendTitleLines(element: HTMLElement, text: string): void {
-  text.split(/\r?\n/).forEach((line, index, lines) => {
+function getTitleLines(cell?: Element | null): string[] {
+  if (!cell) return [];
+  const paragraphs = [...cell.querySelectorAll('p')];
+  const sources = paragraphs.length ? paragraphs.map((paragraph) => paragraph.innerHTML) : [cell.innerHTML];
+  return sources
+    .flatMap((html) => html.split(/<br\s*\/?>|\r?\n/i))
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function appendTitleLines(element: HTMLElement, lines: string[]): void {
+  lines.forEach((line, index) => {
     const lineElement = document.createElement('span');
     lineElement.className = 'offers-carousel-title-line';
-    lineElement.textContent = line;
+    lineElement.innerHTML = line;
     element.append(lineElement);
     if (index < lines.length - 1) element.append(document.createElement('br'));
   });
@@ -255,7 +265,8 @@ export default function decorate(block: HTMLElement): void {
   const rows = [...block.children];
   const anchorId = getFieldText(block, 'id') || textFromCell(rows[0]?.firstElementChild || rows[0]);
   const eyebrow = getFieldText(block, 'eyebrow') || textFromCell(rows[1]?.firstElementChild || rows[1]);
-  const title = getFieldText(block, 'title') || textFromCell(rows[2]?.firstElementChild || rows[2]);
+  const titleCell = getField(block, 'title') || rows[2]?.firstElementChild || rows[2];
+  const titleLines = getTitleLines(titleCell);
 
   const cardRows = rows
     .filter((row) => row.matches('[data-aue-model="offers-carousel-item"]') || row.querySelector('picture, img'))
@@ -278,10 +289,10 @@ export default function decorate(block: HTMLElement): void {
     copy.append(eyebrowEl);
   }
 
-  if (title) {
+  if (titleLines.length) {
     const titleEl = document.createElement('h2');
     titleEl.className = 'offers-carousel-title';
-    appendTitleLines(titleEl, title);
+    appendTitleLines(titleEl, titleLines);
     copy.append(titleEl);
   }
 

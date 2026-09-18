@@ -52,7 +52,7 @@
           "value": ""
         },
         {
-          "component": "text",
+          "component": "richtext",
           "name": "title",
           "label": "Primary Main Title",
           "valueType": "string",
