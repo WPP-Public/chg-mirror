@@ -177,6 +177,12 @@
     ]
   },
   {
+    "id": "hero-banner-with-toggle",
+    "components": [
+      "hero-banner-with-toggle-item"
+    ]
+  },
+  {
     "id": "offers-carousel",
     "components": [
       "offers-carousel-item"
