@@ -52,7 +52,7 @@
           "value": ""
         },
         {
-          "component": "text",
+          "component": "richtext",
           "name": "title",
           "label": "Primary Main Title",
           "valueType": "string",
@@ -66,7 +66,7 @@
       "fields": [
         {
           "component": "reference",
-          "name": "media_cardImage",
+          "name": "image",
           "label": "Card Image",
           "valueType": "string",
           "multi": false,
@@ -74,7 +74,7 @@
         },
         {
           "component": "text",
-          "name": "media_cardImageAlt",
+          "name": "imageAlt",
           "label": "Asset Alt Text",
           "valueType": "string",
           "required": true,
@@ -115,15 +115,11 @@
           "value": ""
         },
         {
-          "component": "select",
+          "component": "boolean",
           "name": "ctas_primaryCtaOpenInNewTab",
           "label": "Primary CTA Open in new tab",
           "valueType": "string",
-          "value": "false",
-          "options": [
-            { "name": "No", "value": "false" },
-            { "name": "Yes", "value": "true" }
-          ]
+          "value": false
         },
         {
           "component": "aem-content",
@@ -139,15 +135,11 @@
           "value": ""
         },
         {
-          "component": "select",
+          "component": "boolean",
           "name": "ctas_secondaryCtaOpenInNewTab",
           "label": "Secondary CTA Open in new tab",
           "valueType": "string",
-          "value": "false",
-          "options": [
-            { "name": "No", "value": "false" },
-            { "name": "Yes", "value": "true" }
-          ]
+          "value": false
         }
       ]
     }
