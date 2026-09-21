@@ -152,6 +152,25 @@
             "value": "highlight"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "mode",
+        "label": "Mode",
+        "options": [
+          {
+            "name": "All (always visible)",
+            "value": ""
+          },
+          {
+            "name": "Experiences",
+            "value": "experiences"
+          },
+          {
+            "name": "Destinations",
+            "value": "destinations"
+          }
+        ]
       }
     ]
   },
@@ -686,6 +705,115 @@
         "name": "content",
         "label": "Content",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "hero-video",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "prefix",
+        "label": "Prefix",
+        "value": "See"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "suffix",
+        "label": "Suffix",
+        "value": "with new eyes"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "transition",
+        "label": "Transition Style",
+        "value": "crossfade",
+        "options": [
+          {
+            "name": "Crossfade",
+            "value": "crossfade"
+          },
+          {
+            "name": "Slide",
+            "value": "slide"
+          },
+          {
+            "name": "Cut",
+            "value": "cut"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "destinationLabel",
+        "label": "Destination Label",
+        "value": "Destinations"
+      },
+      {
+        "component": "aem-content",
+        "name": "destinationUrl",
+        "label": "Destination Page"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "experienceLabel",
+        "label": "Experience Label",
+        "value": "Experiences"
+      },
+      {
+        "component": "aem-content",
+        "name": "experienceUrl",
+        "label": "Experience Page"
+      }
+    ]
+  },
+  {
+    "id": "hero-video-item",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Label"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "video",
+        "label": "Video",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "poster",
+        "label": "Poster Image",
+        "multi": false
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "link",
+        "label": "Link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "focalDesktop",
+        "label": "Focal Point (Desktop)",
+        "value": "center"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "focalMobile",
+        "label": "Focal Point (Mobile)",
+        "value": "center"
       }
     ]
   },
