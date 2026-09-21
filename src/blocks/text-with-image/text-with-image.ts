@@ -3,34 +3,35 @@ export default function decorate(block: HTMLElement): void {
   const blockId = block.querySelector('[data-aue-prop="id"]')?.textContent?.trim();
   if (blockId) block.id = blockId;
 
-  // row 0: eyebrow
-  // row 1: title
-  // row 2: description
-  // row 3: desktop/tablet image (picture)
-  // row 4: desktop/tablet image alt text
-  // row 5: mobile image (picture)
-  // row 6: mobile image alt text
-  // row 7: CTA text
-  // row 8: CTA link
-  // row 9: CTA open in new tab
-  // row 10: block ID
+  // Optional fields may be omitted from the authored markup, so locate image and CTA rows by their content.
   const eyebrowText = rows[0]?.firstElementChild?.textContent?.trim() || '';
   const titleText = rows[1]?.firstElementChild?.textContent?.trim() || '';
   const descriptionEl = rows[2]?.firstElementChild;
-  const pictureEl = rows[3]?.querySelector('picture');
+  const pictureRows = rows.filter((row) => row.querySelector('picture'));
+  const pictureEl = pictureRows[0]?.querySelector('picture');
   const desktopImg = pictureEl?.querySelector('img');
-  const altText = rows[4]?.firstElementChild?.textContent?.trim() || desktopImg?.getAttribute('alt') || '';
-  const mobilePictureEl = rows[5]?.querySelector('picture');
+  const altText = desktopImg?.getAttribute('alt') || '';
+  const mobileAssetRow = pictureRows[1];
+  const mobilePictureEl = mobileAssetRow?.querySelector('picture');
   const mobileImg = mobilePictureEl?.querySelector('img');
   const mobileSource = mobilePictureEl?.querySelector('source');
-  const mobileSrc = mobileSource?.getAttribute('srcset') || mobileImg?.getAttribute('src');
-  const mobileAltText = rows[6]?.firstElementChild?.textContent?.trim() || mobileImg?.getAttribute('alt') || '';
+  const mobileAsset = mobileAssetRow?.querySelector('img, a[href]');
+  const mobileSrc =
+    mobileSource?.getAttribute('srcset') ||
+    mobileImg?.getAttribute('src') ||
+    mobileAsset?.getAttribute('src') ||
+    mobileAsset?.getAttribute('href') ||
+    mobileAssetRow?.textContent?.trim();
+  const mobileAltText = mobileImg?.getAttribute('alt') || '';
   const responsiveAltText = mobileAltText || altText;
-  const ctaText = rows[7]?.firstElementChild?.textContent?.trim() || '';
-  const ctaLinkEl = rows[8]?.querySelector('a');
+  const ctaGroup = rows.find((row) => row.querySelector('a'))?.firstElementChild;
+  const ctaLinkEl = ctaGroup?.querySelector('a');
   const ctaHref = ctaLinkEl?.getAttribute('href') || '';
-  const openInNewTabValue = rows[9]?.firstElementChild?.textContent?.trim().toLowerCase() || '';
-  const openInNewTab = openInNewTabValue === 'true';
+  const ctaTextEl = [...(ctaGroup?.children || [])].find((element) => !element.querySelector('a'));
+  const ctaText = ctaTextEl?.textContent?.trim() || '';
+  const openInNewTab = [...(ctaGroup?.children || [])].some(
+    (element) => element.textContent?.trim().toLowerCase() === 'true',
+  );
 
   if (pictureEl) {
     const responsiveImageQuery = window.matchMedia('(max-width: 767px)');
