@@ -141,15 +141,6 @@
     .text-with-image .text-col {
         padding: var(--dimension-layout-module-padding-block) var(--dimension-layout-module-padding-inline-s);
     }
-
-    .text-with-image .image-col.has-mobile-image {
-        aspect-ratio: 4 / 5;
-    }
-
-    .text-with-image .image-col.has-mobile-image img {
-        height: 100%;
-        object-fit: cover;
-    }
 }
 
 /* Mobile */
