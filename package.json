@@ -19,7 +19,7 @@
   },
   "scripts": {
     "aem:up": "aem up --no-open --url https://main--capella-hotels--WPP-Public.aem.page",
-    "aem:up:drafts": "aem up --no-open --html-folder drafts --html-mount /",
+    "aem:up:drafts": "aem up --no-open --url https://main--capella-hotels--WPP-Public.aem.page --html-folder drafts --html-mount /",
     "build": "tsc --noEmit && npm run build:runtime && npm run build:editor",
     "build:editor": "vite build --config vite.config-editor.ts",
     "build:json": "npm-run-all -p build:json:models build:json:definitions build:json:filters",

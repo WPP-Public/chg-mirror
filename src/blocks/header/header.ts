@@ -1,6 +1,12 @@
 import { getMetadata } from '@/app/aem.js';
 import { loadFragment } from '@/blocks/fragment/fragment.js';
-import { moveInstrumentation, SUPPORTED_SITES, LANG_MAP, VALID_LANG_PRIMARIES } from '@/app/scripts.js';
+import {
+  moveInstrumentation,
+  SUPPORTED_SITES,
+  DEFAULT_SITE_SEGMENT,
+  LANG_MAP,
+  VALID_LANG_PRIMARIES,
+} from '@/app/scripts.js';
 
 if (!('ontouchstart' in window) && !navigator.maxTouchPoints) {
   document.documentElement.classList.add('no-touch');
@@ -42,7 +48,7 @@ interface NavCategory {
 function getFragmentBasePath(): string {
   const segments = window.location.pathname.split('/').filter(Boolean);
   const siteIdx = segments.findIndex((s) => SUPPORTED_SITES.includes(s));
-  const site = siteIdx !== -1 ? segments[siteIdx] : 'global';
+  const site = siteIdx !== -1 ? segments[siteIdx] : DEFAULT_SITE_SEGMENT;
 
   const afterSite = siteIdx !== -1 ? segments.slice(siteIdx + 1) : segments;
   const rawLang = afterSite[0]?.toLowerCase() ?? '';
@@ -250,7 +256,13 @@ function buildLangZone(languages: NavLanguage[], activeLabel: string): HTMLDivEl
   return zone;
 }
 
-function buildLogo(pictureSrc: string, pictureAlt: string, href: string): HTMLAnchorElement {
+function buildLogo(
+  pictureSrc: string,
+  pictureAlt: string,
+  darkSrc: string,
+  darkAlt: string,
+  href: string,
+): HTMLAnchorElement {
   const logo = document.createElement('a');
   logo.className = 'header-logo';
   logo.href = href;
@@ -258,9 +270,21 @@ function buildLogo(pictureSrc: string, pictureAlt: string, href: string): HTMLAn
 
   if (pictureSrc) {
     const img = document.createElement('img');
+    img.className = 'header-logo-img-default';
     img.src = pictureSrc;
     img.alt = pictureAlt || 'Capella';
     logo.append(img);
+
+    // Optional second Image authored in /nav is the dark/active variant shown while
+    // the menu is open; without one, the default logo is reused in both states.
+    if (darkSrc && darkSrc !== pictureSrc) {
+      const darkImg = document.createElement('img');
+      darkImg.className = 'header-logo-img-active';
+      darkImg.src = darkSrc;
+      darkImg.alt = darkAlt || pictureAlt || 'Capella';
+      darkImg.setAttribute('aria-hidden', 'true');
+      logo.append(darkImg);
+    }
     return logo;
   }
 
@@ -537,11 +561,17 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     return;
   }
 
-  const logoImg = chromeSection.querySelector('picture img');
+  const [logoImg, logoImgDark] = chromeSection.querySelectorAll('picture img');
   const ctaAnchor = chromeSection.querySelector<HTMLAnchorElement>('.default-content-wrapper > p > a');
   const activeLang = getActiveLang(languages);
 
-  const logo = buildLogo(logoImg?.getAttribute('src') ?? '', logoImg?.getAttribute('alt') ?? '', activeLang.href);
+  const logo = buildLogo(
+    logoImg?.getAttribute('src') ?? '',
+    logoImg?.getAttribute('alt') ?? '',
+    logoImgDark?.getAttribute('src') ?? '',
+    logoImgDark?.getAttribute('alt') ?? '',
+    activeLang.href,
+  );
   const menuToggle = buildMenuToggle();
   const langZone = buildLangZone(languages, activeLang.shortLabel);
   const cta = buildCtaZone(ctaAnchor?.textContent?.trim() ?? '', ctaAnchor?.getAttribute('href') ?? '');

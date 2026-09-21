@@ -13,7 +13,9 @@ there is no dedicated "Nav" component. The page must have exactly two sections, 
 
 Add, in any order:
 
-- **Image** — the logo. Set the alt text on the image itself.
+- **Image** — the logo. Set the alt text on the image itself. Optionally add a
+  **second Image** immediately after it — the dark/active variant shown while the
+  menu panel is open. If omitted, the default logo is reused in both states.
 - **Text** — the language switcher. Add one bullet list with a single top-level item
   (its text is not shown), and a nested bullet list underneath it with one linked item
   per language, e.g.:
@@ -51,6 +53,7 @@ category label) containing a nested list:
 
 ## 5. Pre-publish Checklist
 
-- [ ] Section 1 has exactly one Image, one language Text list, and one Button
+- [ ] Section 1 has one (or two, if using a dark/active logo variant) Image, one
+      language Text list, and one Button
 - [ ] Section 2 has at least one category Text component with at least one working link
 - [ ] Each Hero block for a promo image comes directly after its category's Text component

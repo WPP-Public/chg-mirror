@@ -4,8 +4,7 @@ header {
     --site-header-text: var(--color-text-action-default, #1b364b);
     --site-header-surface: var(--color-surface-general-subtle, #f9f6f6);
 
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 100;
     height: var(--site-header-height);
     background: transparent;
@@ -21,11 +20,14 @@ header:has(.header-menu-panel.is-open) {
 }
 
 /* A full-bleed hero-banner as the first section should fill the viewport with the
-   header floating transparently on top of it, not pushed below it. position: sticky
-   still reserves its own row in normal flow — cancel that with a matching negative
-   margin so the next section (the hero) starts at the very top, under the header. */
+   header floating transparently on top of it instead of pushing it down. Absolute
+   (not sticky/fixed) removes the header from flow so the hero can start at the very
+   top, while the header still scrolls away with the page like any other content. */
 body:has(main > div:first-child .hero-banner) header {
-    margin-bottom: calc(-1 * var(--site-header-height));
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .header-inner {
@@ -116,6 +118,21 @@ body:has(main > div:first-child .hero-banner) header {
     width: 88px;
     height: 52px;
     object-fit: contain;
+}
+
+/* Optional dark/active logo variant (second Image authored in /nav), shown instead
+   of the default logo while the menu panel is open. Falls back to the single
+   default logo when no variant is authored — see buildLogo in header.ts. */
+.header-logo-img-active {
+    display: none;
+}
+
+header:has(.header-menu-panel.is-open) .header-logo-img-default {
+    display: none;
+}
+
+header:has(.header-menu-panel.is-open) .header-logo-img-active {
+    display: block;
 }
 
 .header-logo-mark {
