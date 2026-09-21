@@ -377,9 +377,8 @@ async function renderGalleryCarousel(
   // Desktop navigates via the prev/next arrows only; wheel/drag scrolling is a tablet/mobile-only affordance
   const isDesktop = window.matchMedia('(min-width: 1200px)').matches;
   if (!isDesktop && track.dataset.loopEvents !== 'true') {
-    let touchStartX: number | null = null;
-    let touchStartedAtBoundary = false;
-    let isScrollSettled = true;
+    let previousScrollLeft = track.scrollLeft;
+    let isWrapping = false;
     let boundaryTimer: number | undefined;
     track.dataset.loopEvents = 'true';
 
@@ -387,26 +386,37 @@ async function renderGalleryCarousel(
       const maxScrollLeft = track.scrollWidth - track.clientWidth;
       const atEnd = track.scrollLeft >= maxScrollLeft - 1;
       const atStart = track.scrollLeft <= 0;
-      if (!isScrollSettled) return false;
       if (direction > 0 && atEnd) {
         jumpToBoundary(0);
-        isScrollSettled = false;
         return true;
       }
       if (direction < 0 && atStart) {
         jumpToBoundary(maxScrollLeft);
-        isScrollSettled = false;
         return true;
       }
       return false;
     };
 
     const updateBoundary = () => {
-      isScrollSettled = true;
+      previousScrollLeft = track.scrollLeft;
     };
 
     track.addEventListener('scroll', () => {
-      isScrollSettled = false;
+      if (isWrapping) return;
+      const direction = track.scrollLeft >= previousScrollLeft ? 1 : -1;
+      const maxScrollLeft = track.scrollWidth - track.clientWidth;
+      const atEnd = track.scrollLeft >= maxScrollLeft - 1;
+      const atStart = track.scrollLeft <= 0;
+      if ((direction > 0 && atEnd) || (direction < 0 && atStart)) {
+        isWrapping = true;
+        jumpToBoundary(direction > 0 ? 0 : maxScrollLeft);
+        previousScrollLeft = track.scrollLeft;
+        window.requestAnimationFrame(() => {
+          isWrapping = false;
+        });
+      } else {
+        previousScrollLeft = track.scrollLeft;
+      }
       window.clearTimeout(boundaryTimer);
       boundaryTimer = window.setTimeout(updateBoundary, 200);
     });
@@ -418,26 +428,6 @@ async function renderGalleryCarousel(
       },
       { passive: false },
     );
-
-    track.addEventListener('pointerdown', (event) => {
-      if (event.pointerType === 'touch') {
-        touchStartX = event.clientX;
-        const maxScrollLeft = track.scrollWidth - track.clientWidth;
-        touchStartedAtBoundary = isScrollSettled && (track.scrollLeft <= 0 || track.scrollLeft >= maxScrollLeft - 1);
-      }
-    });
-
-    track.addEventListener('pointerup', (event) => {
-      if (touchStartX === null) return;
-      const direction = touchStartX - event.clientX;
-      touchStartX = null;
-      if (touchStartedAtBoundary && Math.abs(direction) > 30) wrapAtBoundary(direction);
-      touchStartedAtBoundary = false;
-    });
-
-    track.addEventListener('pointercancel', () => {
-      touchStartX = null;
-    });
 
     track.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight' && wrapAtBoundary(1)) event.preventDefault();
