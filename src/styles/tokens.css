@@ -218,9 +218,10 @@
     --component-slider-bar-height: 16px;
     --component-slider-corner: var(--corner-radius-round);
 
-    /* component / toggle (mobile default; "toogle" is Figma's own typo) */
+    /* component / toggle (mobile default; "toogle" is Figma's own typo); padding accounts for
+       the track's 1px border so the dot is truly centered: (28 - 2*1 - 20) / 2 = 3px */
     --component-toogle-selector-dot: 20px;
-    --component-toogle-padding: 4px;
+    --component-toogle-padding: 3px;
     --component-toogle-width: 64px;
     --component-toogle-height: 28px;
     --component-toogle-corner: var(--corner-radius-round);
@@ -298,9 +299,12 @@
         /* component / input field (tablet) */
         --component-input-field-height: 48px;
 
-        /* component / toggle (tablet) */
+        /* component / toggle (tablet; padding recomputed so the unchanged 20px dot stays
+           vertically centered in the taller 32px track, accounting for the track's 1px border:
+           (32 - 2*1 - 20) / 2 = 5px) */
         --component-toogle-width: 72px;
         --component-toogle-height: 32px;
+        --component-toogle-padding: 5px;
     }
 }
 
@@ -346,8 +350,10 @@
         --component-button-padding-inline: 32px;
         --component-button-padding-block: 16px;
 
-        /* component / toggle (desktop) */
+        /* component / toggle (desktop; must reset padding here or it would inherit tablet's 5px —
+           (32 - 2*1 - 24) / 2 = 3px keeps the larger dot centered, border-adjusted) */
         --component-toogle-selector-dot: 24px;
         --component-toogle-width: 80px;
+        --component-toogle-padding: 3px;
     }
 }
