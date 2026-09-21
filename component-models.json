@@ -1372,27 +1372,27 @@
       {
         "component": "reference",
         "name": "image",
-        "label": "Desktop Asset",
+        "label": "Desktop/Tablet Asset",
         "valueType": "string",
         "required": true
       },
       {
         "component": "text",
         "name": "imageAlt",
-        "label": "Desktop Asset Alt Text",
+        "label": "Desktop/Tablet Asset Alt Text",
         "valueType": "string",
         "required": true
       },
       {
         "component": "reference",
         "name": "imageMobile",
-        "label": "Tablet / Mobile Asset",
+        "label": "Mobile Asset",
         "valueType": "string"
       },
       {
         "component": "text",
         "name": "imageMobileAlt",
-        "label": "Tablet / Mobile Asset Alt Text",
+        "label": "Mobile Asset Alt Text",
         "valueType": "string"
       },
       {
