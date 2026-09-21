@@ -281,6 +281,10 @@
 
 /* Desktop */
 @media (width >= 1200px) {
+    .destination-cards .destination-cards-carousel {
+        padding-inline: var(--dimension-layout-module-padding-inline-s);
+    }
+
     .destination-cards .destination-cards-list {
         grid-auto-columns: calc((100% - 2 * var(--dimension-layout-carousel-item-gap-l)) / 3);
         justify-content: safe center;
