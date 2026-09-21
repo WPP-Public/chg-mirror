@@ -833,6 +833,8 @@
 
 .culturist-carousel-card-modal-panel {
     position: relative;
+    width: min(100%, 26rem);
+    max-height: min(85vh, 34rem);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -841,6 +843,7 @@
     max-height: calc(100vh - 2rem);
     overflow: auto;
     padding: 36px;
+    background: var(--color-surface-primary-default);
     background: #e0d3d1;
     border-radius: var(--corner-radius-xs);
     box-shadow: 0 12px 28px rgb(0 0 0 / 28%);
