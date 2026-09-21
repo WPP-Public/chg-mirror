@@ -122,16 +122,17 @@ body:has(main > div:first-child .hero-banner) header {
 
 /* Optional dark/active logo variant (second Image authored in /nav), shown instead
    of the default logo while the menu panel is open. Falls back to the single
-   default logo when no variant is authored — see buildLogo in header.ts. */
-.header-logo-img-active {
+   default logo when no variant is authored — see buildLogo in header.ts.
+   Selectors match ".header-logo img" specificity so they aren't overridden by it. */
+.header-logo img.header-logo-img-active {
     display: none;
 }
 
-header:has(.header-menu-panel.is-open) .header-logo-img-default {
+header:has(.header-menu-panel.is-open) .header-logo img.header-logo-img-default {
     display: none;
 }
 
-header:has(.header-menu-panel.is-open) .header-logo-img-active {
+header:has(.header-menu-panel.is-open) .header-logo img.header-logo-img-active {
     display: block;
 }
 
