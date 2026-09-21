@@ -24,16 +24,67 @@ function isCardRow(row: HTMLElement): boolean {
   return row.children.length >= 3 || !!row.querySelector('picture, img');
 }
 
+/**
+ * Walks past wrapper divs to the element that directly holds the authored paragraphs.
+ * Outside the editor that is the row's cell; in the Universal Editor `decorateRichtext`
+ * nests one more instrumented div inside it, which would otherwise break both the
+ * second-line indent and the soft-break split.
+ */
+function resolveCopyField(row: HTMLElement): HTMLElement {
+  let field = row;
+  while (field.children.length === 1 && field.firstElementChild?.tagName === 'DIV') {
+    field = field.firstElementChild as HTMLElement;
+  }
+  return field;
+}
+
+/**
+ * Rewrites `<p>one<br>two</p>` as `<p>one</p><p>two</p>` so a heading written with
+ * soft breaks lines up with one written as separate paragraphs. The stylesheet
+ * indents the second child, which only works when each line is its own element.
+ */
+function splitOnLineBreaks(container: Element): void {
+  [...container.children].forEach((element) => {
+    if (!element.querySelector('br')) return;
+
+    const lines = [document.createDocumentFragment()];
+    [...element.childNodes].forEach((node) => {
+      if (node.nodeName === 'BR') lines.push(document.createDocumentFragment());
+      else lines[lines.length - 1]!.append(node);
+    });
+
+    const paragraphs = lines
+      .filter((line) => line.textContent?.trim())
+      .map((line) => {
+        // a fresh element rather than a clone, so no data-aue-* attribute is duplicated
+        const paragraph = document.createElement(element.tagName);
+        paragraph.append(line);
+        return paragraph;
+      });
+
+    if (paragraphs.length) element.replaceWith(...paragraphs);
+  });
+}
+
 // each CTA is authored as url + label (collapsed into one anchor) followed by an open-in-new-tab boolean
 function decorateCtas(cell: HTMLElement): void {
   cell.classList.add('offers-carousel-card-ctas');
 
   const authored = [...cell.children] as HTMLElement[];
-  const flags = authored.filter(isBooleanFlag);
 
   [...cell.querySelectorAll<HTMLAnchorElement>('a')].forEach((anchor, index) => {
     anchor.classList.add('offers-carousel-card-cta');
-    applyTarget(anchor, isEnabled(flags[index]?.textContent?.trim() || ''));
+    anchor.dataset.testid = 'offers-carousel-cta';
+    // pair by position, since a CTA whose url is empty renders as plain text with no anchor
+    const wrapper = authored.findIndex((element) => element === anchor || element.contains(anchor));
+    const flag = wrapper < 0 ? undefined : authored.slice(wrapper + 1).find(isBooleanFlag);
+    applyTarget(anchor, isEnabled(flag?.textContent?.trim() || ''));
+    if (index) {
+      const divider = document.createElement('span');
+      divider.className = 'offers-carousel-card-cta-divider';
+      divider.setAttribute('aria-hidden', 'true');
+      cell.append(divider);
+    }
     // lift the anchor out of its paragraph so the CTAs become adjacent flex siblings
     cell.append(anchor);
   });
@@ -85,12 +136,14 @@ function decorateCard(row: HTMLElement): void {
     body.append(description);
   }
 
+  contentCell.append(body);
+
+  // the CTA row spans the full card, so it stays a sibling of the narrower text column
   if (ctaCell) {
     decorateCtas(ctaCell);
-    body.append(ctaCell);
+    contentCell.append(ctaCell);
   }
 
-  contentCell.append(body);
   mediaCell.append(contentCell);
 }
 
@@ -162,6 +215,8 @@ function wireInteraction(root: HTMLElement, cards: HTMLElement[]): void {
 export default function decorate(block: HTMLElement): void {
   if (block.querySelector(':scope > .offers-carousel-layout')) return;
 
+  block.dataset.testid = 'offers-carousel';
+
   const rows = [...block.children] as HTMLElement[];
   const cardRows = rows.filter(isCardRow);
   const [idRow, eyebrowRow, titleRow] = rows.filter((row) => !cardRows.includes(row));
@@ -174,12 +229,14 @@ export default function decorate(block: HTMLElement): void {
   copy.className = 'offers-carousel-copy';
 
   if (eyebrowRow) {
-    eyebrowRow.classList.add('offers-carousel-eyebrow');
+    resolveCopyField(eyebrowRow).classList.add('offers-carousel-eyebrow');
     copy.append(eyebrowRow);
   }
 
   if (titleRow) {
-    titleRow.classList.add('offers-carousel-title');
+    const title = resolveCopyField(titleRow);
+    title.classList.add('offers-carousel-title');
+    splitOnLineBreaks(title);
     copy.append(titleRow);
   }
 
