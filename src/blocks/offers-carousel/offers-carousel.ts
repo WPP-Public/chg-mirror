@@ -1,199 +1,97 @@
-import { moveInstrumentation } from '@/app/scripts.js';
-
-function textFromCell(cell?: Element | null): string {
-  return cell?.textContent?.trim() || '';
-}
-
-function getField(row: Element, property: string): Element | null {
-  if (row.getAttribute('data-aue-prop') === property) return row;
-  return row.querySelector(`[data-aue-prop="${property}"]`);
-}
-
-function getFieldText(row: Element, property: string): string {
-  return textFromCell(getField(row, property));
-}
+const CARD_MODEL = 'offers-carousel-item';
 
 function isEnabled(value: string): boolean {
   return ['true', 'yes', 'enabled'].includes(value.trim().toLowerCase());
 }
 
-function getLinkTarget(cell: Element, linkIndex: number): boolean {
-  const values = [...cell.children].filter((child) => !child.querySelector('a'));
-  return isEnabled(textFromCell(values[linkIndex]));
+function isBooleanFlag(element: Element): boolean {
+  return /^(true|false)$/i.test(element.textContent?.trim() || '');
 }
 
-function applyTarget(anchor: HTMLAnchorElement, openInNewTab?: boolean): void {
+function getField(root: Element, property: string): HTMLElement | null {
+  return root.querySelector<HTMLElement>(`[data-aue-prop="${property}"]`);
+}
+
+function applyTarget(anchor: HTMLAnchorElement, openInNewTab: boolean): void {
   if (!openInNewTab) return;
   anchor.target = '_blank';
   anchor.rel = 'noopener noreferrer';
 }
 
-function getTitleLines(cell?: Element | null): string[] {
-  if (!cell) return [];
-  const paragraphs = [...cell.querySelectorAll('p')];
-  const sources = paragraphs.length ? paragraphs.map((paragraph) => paragraph.innerHTML) : [cell.innerHTML];
-  return sources
-    .flatMap((html) => html.split(/<br\s*\/?>|\r?\n/i))
-    .map((line) => line.trim())
-    .filter(Boolean);
+// in the editor every item row carries the item model; outside it we fall back to the cell shape
+function isCardRow(row: HTMLElement): boolean {
+  if (row.dataset.aueModel) return row.dataset.aueModel === CARD_MODEL;
+  return row.children.length >= 3 || !!row.querySelector('picture, img');
 }
 
-function appendTitleLines(element: HTMLElement, lines: string[]): void {
-  lines.forEach((line, index) => {
-    const lineElement = document.createElement('span');
-    lineElement.className = 'offers-carousel-title-line';
-    lineElement.innerHTML = line;
-    element.append(lineElement);
-    if (index < lines.length - 1) element.append(document.createElement('br'));
+// each CTA is authored as url + label (collapsed into one anchor) followed by an open-in-new-tab boolean
+function decorateCtas(cell: HTMLElement): void {
+  cell.classList.add('offers-carousel-card-ctas');
+
+  const authored = [...cell.children] as HTMLElement[];
+  const flags = authored.filter(isBooleanFlag);
+
+  [...cell.querySelectorAll<HTMLAnchorElement>('a')].forEach((anchor, index) => {
+    anchor.classList.add('offers-carousel-card-cta');
+    applyTarget(anchor, isEnabled(flags[index]?.textContent?.trim() || ''));
+    // lift the anchor out of its paragraph so the CTAs become adjacent flex siblings
+    cell.append(anchor);
   });
+
+  // the booleans and the paragraphs the anchors were lifted out of are authoring artefacts
+  authored
+    .filter((element) => !element.matches('a'))
+    .forEach((element) => element.classList.add('offers-carousel-card-cta-flag'));
 }
 
-interface CardLink {
-  href: string;
-  label: string;
-  openInNewTab: boolean;
-}
+// decoration happens in place so that every instrumented cell survives for the Universal Editor
+function decorateCard(row: HTMLElement): void {
+  row.classList.add('offers-carousel-card');
 
-function getCardLink(
-  row: Element,
-  urlProperty: string,
-  labelProperty: string,
-  targetProperty: string,
-): CardLink | null {
-  const urlField = getField(row, urlProperty);
-  const href = urlField?.querySelector('a')?.getAttribute('href') || textFromCell(urlField);
-  const label = getFieldText(row, labelProperty);
-  if (!href || !label) return null;
+  const [mediaCell, contentCell, ctaCell] = [...row.children] as HTMLElement[];
+  if (!mediaCell || !contentCell) return;
 
-  return {
-    href,
-    label,
-    openInNewTab: isEnabled(getFieldText(row, targetProperty)),
+  mediaCell.classList.add('offers-carousel-card-media');
+  contentCell.classList.add('offers-carousel-card-overlay');
+
+  const parts = [...contentCell.children] as HTMLElement[];
+  const taken = new Set<HTMLElement>();
+  // outside the editor there are no field markers, so fall back to the authored order
+  const pick = (property: string, index: number): HTMLElement | undefined => {
+    const part = getField(contentCell, property) || parts[index];
+    if (!part || taken.has(part)) return undefined;
+    taken.add(part);
+    return part;
   };
-}
 
-interface CardData {
-  media: Element;
-  eyebrow: string;
-  headline: string;
-  description: string;
-  primary: CardLink | null;
-  secondary: CardLink | null;
-}
+  const eyebrow = pick('content_cardEyebrow', 0);
+  const headline = pick('content_headline', 1);
+  const description = pick('content_cardDescription', 2);
 
-function parseCard(row: Element): CardData | null {
-  const cells = [...row.children];
-  const mediaCell = getField(row, 'image') || cells[0];
-  const contentCell = getField(row, 'content_cardDescription') || cells[1];
-  const ctaCell = cells[2];
-  const media = mediaCell?.querySelector('picture, img');
-  if (!media) return null;
-
-  const paragraphs = contentCell ? [...contentCell.querySelectorAll('p')] : [];
-  const eyebrow = getFieldText(row, 'content_cardEyebrow') || paragraphs[0]?.textContent?.trim() || '';
-  const headline = getFieldText(row, 'content_headline') || paragraphs[1]?.textContent?.trim() || '';
-  const descriptionField = getField(row, 'content_cardDescription');
-  const description =
-    descriptionField?.innerHTML || paragraphs[2]?.innerHTML || contentCell?.querySelector('div')?.innerHTML || '';
-
-  const primary = getCardLink(row, 'ctas_primaryCta', 'ctas_primaryCtaText', 'ctas_primaryCtaOpenInNewTab');
-  const secondary = getCardLink(row, 'ctas_secondaryCta', 'ctas_secondaryCtaText', 'ctas_secondaryCtaOpenInNewTab');
-
-  if (!primary && !secondary && ctaCell) {
-    const links = [...ctaCell.querySelectorAll('a')];
-    const labels = links.map((link) => link.textContent?.trim() || '');
-    const legacyLinks = links.map((link, index) =>
-      labels[index]
-        ? { href: link.getAttribute('href') || '', label: labels[index], openInNewTab: getLinkTarget(ctaCell, index) }
-        : null,
-    );
-    return {
-      media,
-      eyebrow,
-      headline,
-      description,
-      primary: legacyLinks[0] || null,
-      secondary: legacyLinks[1] || null,
-    };
-  }
-
-  return {
-    media,
-    eyebrow,
-    headline,
-    description,
-    primary,
-    secondary,
-  };
-}
-
-function createCard(card: CardData, row: Element): HTMLLIElement {
-  const item = document.createElement('li');
-  item.className = 'offers-carousel-card';
-  moveInstrumentation(row, item);
-
-  const mediaWrap = document.createElement('div');
-  mediaWrap.className = 'offers-carousel-card-media';
-
-  const mediaNode =
-    card.media.tagName.toLowerCase() === 'picture' ? card.media : card.media.closest('picture') || card.media;
-  mediaWrap.append(mediaNode);
-
-  const overlay = document.createElement('div');
-  overlay.className = 'offers-carousel-card-overlay';
-
-  if (card.eyebrow) {
-    const eyebrow = document.createElement('p');
-    eyebrow.className = 'offers-carousel-card-eyebrow';
-    eyebrow.textContent = card.eyebrow;
-    overlay.append(eyebrow);
-  }
+  eyebrow?.classList.add('offers-carousel-card-eyebrow');
 
   const body = document.createElement('div');
   body.className = 'offers-carousel-card-body';
 
-  if (card.headline) {
-    const headline = document.createElement('h3');
-    headline.className = 'offers-carousel-card-title';
-    headline.textContent = card.headline;
+  if (headline) {
+    headline.classList.add('offers-carousel-card-title');
+    headline.setAttribute('role', 'heading');
+    headline.setAttribute('aria-level', '3');
     body.append(headline);
   }
 
-  if (card.description) {
-    const description = document.createElement('div');
-    description.className = 'offers-carousel-card-description';
-    description.innerHTML = card.description;
+  if (description) {
+    description.classList.add('offers-carousel-card-description');
     body.append(description);
   }
 
-  const ctas = document.createElement('div');
-  ctas.className = 'offers-carousel-card-ctas';
-
-  if (card.primary) {
-    const primary = document.createElement('a');
-    primary.className = 'offers-carousel-card-cta';
-    primary.href = card.primary.href;
-    primary.textContent = card.primary.label;
-    applyTarget(primary, card.primary.openInNewTab);
-    ctas.append(primary);
+  if (ctaCell) {
+    decorateCtas(ctaCell);
+    body.append(ctaCell);
   }
 
-  if (card.secondary) {
-    const secondary = document.createElement('a');
-    secondary.className = 'offers-carousel-card-cta';
-    secondary.href = card.secondary.href;
-    secondary.textContent = card.secondary.label;
-    applyTarget(secondary, card.secondary.openInNewTab);
-    ctas.append(secondary);
-  }
-
-  body.append(ctas);
-  if (!ctas.children.length) ctas.remove();
-  overlay.append(body);
-  mediaWrap.append(overlay);
-  item.append(mediaWrap);
-
-  return item;
+  contentCell.append(body);
+  mediaCell.append(contentCell);
 }
 
 function applyStackState(cards: HTMLElement[], activeIndex: number): void {
@@ -262,57 +160,45 @@ function wireInteraction(root: HTMLElement, cards: HTMLElement[]): void {
 }
 
 export default function decorate(block: HTMLElement): void {
-  const rows = [...block.children];
-  const anchorId = getFieldText(block, 'id') || textFromCell(rows[0]?.firstElementChild || rows[0]);
-  const eyebrow = getFieldText(block, 'eyebrow') || textFromCell(rows[1]?.firstElementChild || rows[1]);
-  const titleCell = getField(block, 'title') || rows[2]?.firstElementChild || rows[2];
-  const titleLines = getTitleLines(titleCell);
+  if (block.querySelector(':scope > .offers-carousel-layout')) return;
 
-  const cardRows = rows
-    .filter((row) => row.matches('[data-aue-model="offers-carousel-item"]') || row.querySelector('picture, img'))
-    .slice(0, 3);
-  const cardsData = cardRows.map((row) => parseCard(row)).filter((card): card is CardData => card !== null);
+  const rows = [...block.children] as HTMLElement[];
+  const cardRows = rows.filter(isCardRow);
+  const [idRow, eyebrowRow, titleRow] = rows.filter((row) => !cardRows.includes(row));
 
-  if (!cardsData.length) return;
-
-  const root = document.createElement('div');
-  root.className = 'offers-carousel-layout';
-  if (anchorId) root.id = anchorId.replace(/^#/, '');
+  const anchorId = idRow?.textContent?.trim();
+  if (anchorId) block.id = anchorId.replace(/^#/, '');
+  idRow?.classList.add('offers-carousel-config');
 
   const copy = document.createElement('div');
   copy.className = 'offers-carousel-copy';
 
-  if (eyebrow) {
-    const eyebrowEl = document.createElement('p');
-    eyebrowEl.className = 'offers-carousel-eyebrow';
-    eyebrowEl.textContent = eyebrow;
-    copy.append(eyebrowEl);
+  if (eyebrowRow) {
+    eyebrowRow.classList.add('offers-carousel-eyebrow');
+    copy.append(eyebrowRow);
   }
 
-  if (titleLines.length) {
-    const titleEl = document.createElement('h2');
-    titleEl.className = 'offers-carousel-title';
-    appendTitleLines(titleEl, titleLines);
-    copy.append(titleEl);
+  if (titleRow) {
+    titleRow.classList.add('offers-carousel-title');
+    copy.append(titleRow);
   }
+
+  const cards = document.createElement('div');
+  cards.className = 'offers-carousel-cards';
+
+  cardRows.forEach((row) => {
+    decorateCard(row);
+    cards.append(row);
+  });
 
   const stage = document.createElement('div');
   stage.className = 'offers-carousel-stage';
-
-  const cards = document.createElement('ul');
-  cards.className = 'offers-carousel-cards';
-
-  const cardEls = cardsData.map((card, index) => {
-    const row = cardRows[index];
-    const element = createCard(card, row!);
-    cards.append(element);
-    return element;
-  });
-
   stage.append(cards);
 
-  root.append(copy, stage);
-  block.replaceChildren(root);
+  const layout = document.createElement('div');
+  layout.className = 'offers-carousel-layout';
+  layout.append(copy, stage);
+  block.append(layout);
 
-  wireInteraction(root, cardEls);
+  if (cardRows.length) wireInteraction(layout, cardRows);
 }
