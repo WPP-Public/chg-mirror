@@ -163,18 +163,15 @@ footer {
         flex: 1 1 0;
     }
 
-    /* contact info and social sit side by side, aligned to the same 2-column
-       widths as the nav columns above (matches the Figma tablet frame, where
-       "Follow Us On" starts at the same x-position as the 2nd nav column) */
+    /* contact info is wider than social in the Figma tablet frame */
     .footer-contact {
-        flex-direction: row;
-        align-items: flex-start;
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
         gap: var(--dimension-layout-module-gutter-xl);
     }
 
     .footer-contact-info,
     .footer-social {
-        flex: 1 1 0;
         min-width: 0;
     }
 
