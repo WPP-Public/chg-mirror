@@ -835,16 +835,8 @@
     position: relative;
     width: min(100%, 26rem);
     max-height: min(85vh, 34rem);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 32px;
-    width: min(100%, 792px);
-    max-height: calc(100vh - 2rem);
     overflow: auto;
-    padding: 36px;
     background: var(--color-surface-primary-default);
-    background: #e0d3d1;
     border-radius: var(--corner-radius-xs);
     box-shadow: 0 12px 28px rgb(0 0 0 / 28%);
     transform: scale(0.96) translateY(8px);
@@ -896,17 +888,14 @@
 
 .culturist-carousel-card-modal-close {
     position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
+    top: var(--dimension-spacing-general-xs);
+    right: var(--dimension-spacing-general-xs);
+    z-index: 1;
+    width: 2rem;
+    height: 2rem;
     border: 0;
-    background: transparent;
     border-radius: var(--corner-radius-round);
+    background: rgb(255 255 255 / 85%);
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -926,166 +915,27 @@
     background-position: center;
 }
 
-.culturist-carousel-card-modal-close-icon {
-    position: relative;
+.culturist-carousel-card-modal-image {
     display: block;
-    width: 28px;
-    height: 28px;
-}
-
-.culturist-carousel-card-modal-close-icon::before,
-.culturist-carousel-card-modal-close-icon::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 16.8px;
-    border-top: 2px solid #1b364b;
-}
-
-.culturist-carousel-card-modal-close-icon::before {
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.culturist-carousel-card-modal-close-icon::after {
-    transform: translate(-50%, -50%) rotate(135deg);
-}
-
-.culturist-carousel-card-modal-image-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
     width: 100%;
-    aspect-ratio: 720 / 405;
-    padding: 28px;
-    background-color: #000;
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-
-.culturist-carousel-card-modal-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background: rgb(0 0 0 / 40%);
-}
-
-.culturist-carousel-card-modal-title-block {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-    width: 100%;
-}
-
-.culturist-carousel-card-modal-eyebrow {
-    margin: 0;
-    font-family: var(--body-font-family, 'Calibre', Arial, sans-serif);
-    font-size: 18px;
-    line-height: 22px;
-    color: #fff;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
 }
 
 .culturist-carousel-card-modal-title {
     margin: 0;
-    font-family: var(--heading-font-family, 'Goudy Regular', Georgia, serif);
-    font-weight: 400;
-    font-size: 36px;
-    line-height: 36px;
-    color: #fff;
+    padding: var(--dimension-spacing-general-m) var(--dimension-spacing-general-l);
+    font-family: var(--type-font-family-heading);
+    font-size: var(--typography-fontsize-heading-h4);
+    line-height: var(--typography-line-height-heading-h4);
+    color: var(--color-text-main-heading);
+    overflow-wrap: break-word;
 }
 
-.culturist-carousel-card-modal-footer {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    width: 100%;
-}
-
-.culturist-carousel-card-modal-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-    flex: 0 1 344px;
-}
-
-.culturist-carousel-card-modal-curates {
-    flex: none;
-    font-family: var(--body-font-family, 'Calibre', Arial, sans-serif);
-    font-size: 20px;
-    line-height: 22px;
-    color: #262727;
-}
-
-.culturist-carousel-card-modal-subtitle {
-    margin: 0;
-    font-family: var(--body-font-family, 'Calibre', Arial, sans-serif);
-    font-size: 18px;
-    line-height: 22px;
-    color: #262727;
-}
-
-.culturist-carousel-card-modal-action {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    flex: 1 1 auto;
-    align-self: stretch;
-}
-
-.culturist-carousel-card-modal-link {
-    font-family: var(--body-font-family, 'Calibre', Arial, sans-serif);
-    font-size: 18px;
-    line-height: 22px;
-    text-transform: uppercase;
-    text-decoration: underline;
-    color: #1b364b;
-}
-
-/* Preserve a useful popup when a card has a title but no image. */
+/* No image means the title is the first thing in the panel; clear the floating close button */
 .culturist-carousel-card-modal-panel--no-image .culturist-carousel-card-modal-title {
     padding-top: calc(2rem + var(--dimension-spacing-general-l));
-    color: var(--color-text-main-heading);
-}
-
-.culturist-carousel-card-modal-panel--no-image .culturist-carousel-card-modal-image-card {
-    aspect-ratio: auto;
-    padding: var(--dimension-spacing-general-m) var(--dimension-spacing-general-l);
-    background: transparent;
-}
-
-.culturist-carousel-card-modal-panel--no-image .culturist-carousel-card-modal-overlay {
-    display: none;
-}
-
-.culturist-carousel-card-modal-panel--no-image .culturist-carousel-card-modal-title-block {
-    position: static;
-}
-
-@media (width < 768px) {
-    .culturist-carousel-card-modal-panel {
-        gap: 20px;
-        padding: 24px 20px;
-    }
-
-    .culturist-carousel-card-modal-title {
-        font-size: 26px;
-        line-height: 28px;
-    }
-
-    .culturist-carousel-card-modal-footer {
-        gap: 16px;
-        flex-direction: column;
-    }
-
-    .culturist-carousel-card-modal-action {
-        justify-content: flex-start;
-    }
 }
 
 body.culturist-carousel-modal-open {

@@ -37,13 +37,6 @@ function removePlainQuoteMarks(html: string): string {
   return html.replace(/^(\s*<p>)(?:&quot;|")([\s\S]*?)(?:&quot;|")(\s*<\/p>\s*)$/i, '$1$2$3');
 }
 
-function htmlToText(html?: string | null): string {
-  if (!html) return '';
-  const holder = document.createElement('div');
-  holder.innerHTML = html;
-  return (holder.textContent || '').trim();
-}
-
 async function fetchCFDetails(cfPath: string): Promise<Record<string, any> | null> {
   try {
     const publishBase = getPublishBaseUrl();
@@ -169,52 +162,12 @@ function buildCardModal(root: HTMLElement): { openModal: (card: Record<string, a
   closeBtn.type = 'button';
   closeBtn.className = 'culturist-carousel-card-modal-close';
   closeBtn.setAttribute('aria-label', 'Close popup');
-  closeBtn.innerHTML = '<span class="culturist-carousel-card-modal-close-icon" aria-hidden="true"></span>';
 
-  const imageCard = document.createElement('div');
-  imageCard.className = 'culturist-carousel-card-modal-image-card';
-
-  const overlay = document.createElement('span');
-  overlay.className = 'culturist-carousel-card-modal-overlay';
-
-  const titleBlock = document.createElement('div');
-  titleBlock.className = 'culturist-carousel-card-modal-title-block';
-
-  const eyebrow = document.createElement('p');
-  eyebrow.className = 'culturist-carousel-card-modal-eyebrow';
+  const image = document.createElement('img');
+  image.className = 'culturist-carousel-card-modal-image';
 
   const title = document.createElement('p');
   title.className = 'culturist-carousel-card-modal-title';
-
-  titleBlock.append(eyebrow, title);
-
-  imageCard.append(overlay, titleBlock);
-
-  const footer = document.createElement('div');
-  footer.className = 'culturist-carousel-card-modal-footer';
-
-  const content = document.createElement('div');
-  content.className = 'culturist-carousel-card-modal-content';
-
-  const curates = document.createElement('span');
-  curates.className = 'culturist-carousel-card-modal-curates';
-
-  const subtitle = document.createElement('p');
-  subtitle.className = 'culturist-carousel-card-modal-subtitle';
-
-  content.append(curates, subtitle);
-
-  const action = document.createElement('div');
-  action.className = 'culturist-carousel-card-modal-action';
-
-  const actionLink = document.createElement('a');
-  actionLink.className = 'culturist-carousel-card-modal-link';
-  action.append(actionLink);
-
-  footer.append(content, action);
-  panel.append(closeBtn, imageCard, footer);
-  modal.append(panel);
-  root.append(modal);
 
   const closeModal = () => {
     modal.classList.remove('is-open');
@@ -230,38 +183,23 @@ function buildCardModal(root: HTMLElement): { openModal: (card: Record<string, a
     if (event.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
   });
 
-  // Popup content comes from the card only; any field the card doesn't carry stays empty
+  panel.append(closeBtn, image, title);
+  modal.append(panel);
+  root.append(modal);
+
   const openModal = (card: Record<string, any>) => {
     const { _path: cardImgPath } = card.image || {};
-    // Nothing to show a popup for; keep the modal closed instead of an empty panel.
+    // Nothing to show a popup for; keep the modal closed instead of an empty white box.
     if (!cardImgPath && !card.title) return;
 
-    const imageUrl = cardImgPath ? resolveAssetUrl(cardImgPath) : null;
-    imageCard.style.backgroundImage = imageUrl ? `url("${imageUrl}")` : '';
-    imageCard.setAttribute('role', 'img');
-    imageCard.setAttribute('aria-label', card.imagealt || card.title || '');
-    panel.classList.toggle('culturist-carousel-card-modal-panel--no-image', !cardImgPath);
-
-    eyebrow.hidden = !card.eyebrow;
-    eyebrow.textContent = card.eyebrow || '';
-
+    image.hidden = !cardImgPath;
+    if (cardImgPath) {
+      image.src = resolveAssetUrl(cardImgPath) ?? '';
+      image.alt = card.imagealt || card.title || '';
+    }
     title.hidden = !card.title;
     title.textContent = card.title || '';
-
-    const cardSubtitle = htmlToText(card.description?.html) || card.description || card.subtitle || '';
-    curates.hidden = !card.label;
-    curates.textContent = card.label || '';
-    subtitle.hidden = !cardSubtitle;
-    subtitle.textContent = cardSubtitle;
-
-    const cardHref = resolveLinkHref(card.cardLink, card.cardExternalLink);
-    const hasCta = Boolean(card.ctaLabel && cardHref);
-    action.hidden = !hasCta;
-    if (hasCta) {
-      actionLink.href = cardHref as string;
-      actionLink.textContent = card.ctaLabel;
-      applyLinkTarget(actionLink, card.openInNewTab ?? false);
-    }
+    panel.classList.toggle('culturist-carousel-card-modal-panel--no-image', !cardImgPath);
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('culturist-carousel-modal-open');
@@ -377,8 +315,9 @@ async function renderGalleryCarousel(
   // Desktop navigates via the prev/next arrows only; wheel/drag scrolling is a tablet/mobile-only affordance
   const isDesktop = window.matchMedia('(min-width: 1200px)').matches;
   if (!isDesktop && track.dataset.loopEvents !== 'true') {
-    let previousScrollLeft = track.scrollLeft;
-    let isWrapping = false;
+    let touchStartX: number | null = null;
+    let touchStartedAtBoundary = false;
+    let isScrollSettled = true;
     let boundaryTimer: number | undefined;
     track.dataset.loopEvents = 'true';
 
@@ -386,37 +325,26 @@ async function renderGalleryCarousel(
       const maxScrollLeft = track.scrollWidth - track.clientWidth;
       const atEnd = track.scrollLeft >= maxScrollLeft - 1;
       const atStart = track.scrollLeft <= 0;
+      if (!isScrollSettled) return false;
       if (direction > 0 && atEnd) {
         jumpToBoundary(0);
+        isScrollSettled = false;
         return true;
       }
       if (direction < 0 && atStart) {
         jumpToBoundary(maxScrollLeft);
+        isScrollSettled = false;
         return true;
       }
       return false;
     };
 
     const updateBoundary = () => {
-      previousScrollLeft = track.scrollLeft;
+      isScrollSettled = true;
     };
 
     track.addEventListener('scroll', () => {
-      if (isWrapping) return;
-      const direction = track.scrollLeft >= previousScrollLeft ? 1 : -1;
-      const maxScrollLeft = track.scrollWidth - track.clientWidth;
-      const atEnd = track.scrollLeft >= maxScrollLeft - 1;
-      const atStart = track.scrollLeft <= 0;
-      if ((direction > 0 && atEnd) || (direction < 0 && atStart)) {
-        isWrapping = true;
-        jumpToBoundary(direction > 0 ? 0 : maxScrollLeft);
-        previousScrollLeft = track.scrollLeft;
-        window.requestAnimationFrame(() => {
-          isWrapping = false;
-        });
-      } else {
-        previousScrollLeft = track.scrollLeft;
-      }
+      isScrollSettled = false;
       window.clearTimeout(boundaryTimer);
       boundaryTimer = window.setTimeout(updateBoundary, 200);
     });
@@ -428,6 +356,26 @@ async function renderGalleryCarousel(
       },
       { passive: false },
     );
+
+    track.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'touch') {
+        touchStartX = event.clientX;
+        const maxScrollLeft = track.scrollWidth - track.clientWidth;
+        touchStartedAtBoundary = isScrollSettled && (track.scrollLeft <= 0 || track.scrollLeft >= maxScrollLeft - 1);
+      }
+    });
+
+    track.addEventListener('pointerup', (event) => {
+      if (touchStartX === null) return;
+      const direction = touchStartX - event.clientX;
+      touchStartX = null;
+      if (touchStartedAtBoundary && Math.abs(direction) > 30) wrapAtBoundary(direction);
+      touchStartedAtBoundary = false;
+    });
+
+    track.addEventListener('pointercancel', () => {
+      touchStartX = null;
+    });
 
     track.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight' && wrapAtBoundary(1)) event.preventDefault();
