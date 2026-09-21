@@ -66,7 +66,7 @@
       "fields": [
         {
           "component": "reference",
-          "name": "image",
+          "name": "media_cardImage",
           "label": "Card Image",
           "valueType": "string",
           "multi": false,
@@ -74,7 +74,7 @@
         },
         {
           "component": "text",
-          "name": "imageAlt",
+          "name": "media_cardImageAlt",
           "label": "Asset Alt Text",
           "valueType": "string",
           "required": true,

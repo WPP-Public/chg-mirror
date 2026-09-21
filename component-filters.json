@@ -24,6 +24,7 @@
       "newsletter-form",
       "culturist-carousel",
       "destination-cards",
+      "experience-tiles",
       "destination-introduction",
       "interactive-asset",
       "filters-grid",
@@ -156,6 +157,12 @@
     "id": "destination-introduction",
     "components": [
       "destination-introduction-image"
+    ]
+  },
+  {
+    "id": "experience-tiles",
+    "components": [
+      "experience-tiles-item"
     ]
   },
   {
