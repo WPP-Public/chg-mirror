@@ -1,5 +1,5 @@
 mountpoints:
   /:
-    url: "https://author-p152536-e1620746.adobeaemcloud.com/bin/franklin.delivery/capella-hotel-group/capella-hotels/main"
+    url: "https://author-p35060-e2270128.adobeaemcloud.com/bin/franklin.delivery/wpp-public/chg-mirror/main"
     type: "markup"
     suffix: ".html"

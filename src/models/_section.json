@@ -35,6 +35,25 @@
               "value": "highlight"
             }
           ]
+        },
+        {
+          "component": "select",
+          "name": "mode",
+          "label": "Mode",
+          "options": [
+            {
+              "name": "All (always visible)",
+              "value": ""
+            },
+            {
+              "name": "Experiences",
+              "value": "experiences"
+            },
+            {
+              "name": "Destinations",
+              "value": "destinations"
+            }
+          ]
         }
       ]
     }
@@ -59,10 +78,13 @@
         "newsletter-form",
         "culturist-carousel",
         "destination-cards",
+        "experience-tiles",
+        "destination-introduction",
         "interactive-asset",
         "filters-grid",
         "offers-carousel",
         "text-with-cta",
+        "hero-video",
         "rte"
       ]
     },

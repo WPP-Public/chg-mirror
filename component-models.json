@@ -152,6 +152,25 @@
             "value": "highlight"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "mode",
+        "label": "Mode",
+        "options": [
+          {
+            "name": "All (always visible)",
+            "value": ""
+          },
+          {
+            "name": "Experiences",
+            "value": "experiences"
+          },
+          {
+            "name": "Destinations",
+            "value": "destinations"
+          }
+        ]
       }
     ]
   },
@@ -171,25 +190,6 @@
         "valueType": "string",
         "label": "Section Description",
         "required": true
-      },
-      {
-        "component": "text",
-        "name": "cta",
-        "valueType": "string",
-        "label": "CTA Label"
-      },
-      {
-        "component": "aem-content",
-        "name": "cta_link",
-        "valueType": "string",
-        "label": "CTA Link"
-      },
-      {
-        "component": "boolean",
-        "name": "cta_openInNewTab",
-        "valueType": "boolean",
-        "value": false,
-        "label": "Open CTA in new tab"
       },
       {
         "component": "text",
@@ -416,6 +416,172 @@
     ]
   },
   {
+    "id": "destination-introduction",
+    "fields": [
+      {
+        "component": "text",
+        "name": "eyebrow",
+        "label": "Eyebrow",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "title",
+        "label": "Title",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "body",
+        "label": "Body",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "footerCta",
+        "label": "Footer CTA",
+        "valueType": "string",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "destination-introduction-image",
+    "fields": [
+      {
+        "component": "reference",
+        "name": "image",
+        "label": "Image",
+        "valueType": "string",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "name": "imageAlt",
+        "label": "Asset Alt Text",
+        "valueType": "string",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "experience-tiles-item",
+    "fields": [
+      {
+        "component": "text",
+        "name": "visualEyebrow",
+        "label": "Location Eyebrow",
+        "valueType": "string",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "headline",
+        "label": "Experience Title",
+        "valueType": "string",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "name": "visualImage",
+        "label": "Tile Image",
+        "valueType": "string",
+        "required": true,
+        "multi": false
+      },
+      {
+        "component": "text",
+        "name": "visualImageAlt",
+        "label": "Tile Image Alt Text",
+        "valueType": "string",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "text",
+        "name": "detailTitle",
+        "label": "Guide / Activity Title",
+        "valueType": "string",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Experience Description",
+        "valueType": "string",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "reference",
+        "name": "detailsImage",
+        "label": "Details Tile Image",
+        "valueType": "string",
+        "required": true,
+        "multi": false
+      },
+      {
+        "component": "text",
+        "name": "detailsImageAlt",
+        "label": "Details Image Alt Text",
+        "valueType": "string",
+        "required": true,
+        "value": ""
+      },
+      {
+        "component": "text",
+        "name": "enquireLabel",
+        "label": "Enquire CTA Label",
+        "valueType": "string",
+        "required": true,
+        "value": "ENQUIRE"
+      },
+      {
+        "component": "aem-content",
+        "name": "enquireModalPath",
+        "label": "Enquire Modal Fragment Path",
+        "description": "Path to the fragment holding the enquiry form modal content.",
+        "valueType": "string",
+        "required": true
+      },
+      {
+        "component": "boolean",
+        "name": "enquireOpenInNewTab",
+        "label": "Enquire Opens in New Tab",
+        "valueType": "boolean",
+        "value": false
+      },
+      {
+        "component": "text",
+        "name": "detailsLabel",
+        "label": "Details CTA Label",
+        "valueType": "string",
+        "required": true,
+        "value": "DETAILS"
+      },
+      {
+        "component": "aem-content",
+        "name": "detailsUrl",
+        "label": "Details Destination URL",
+        "valueType": "string",
+        "required": true
+      },
+      {
+        "component": "boolean",
+        "name": "detailsOpenInNewTab",
+        "label": "Details Opens in New Tab",
+        "valueType": "boolean",
+        "value": false
+      }
+    ]
+  },
+  {
     "id": "filters-grid",
     "fields": [
       {
@@ -556,6 +722,115 @@
         "name": "content",
         "label": "Content",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "hero-video",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "prefix",
+        "label": "Prefix",
+        "value": "See"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "suffix",
+        "label": "Suffix",
+        "value": "with new eyes"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "transition",
+        "label": "Transition Style",
+        "value": "crossfade",
+        "options": [
+          {
+            "name": "Crossfade",
+            "value": "crossfade"
+          },
+          {
+            "name": "Slide",
+            "value": "slide"
+          },
+          {
+            "name": "Cut",
+            "value": "cut"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "destinationLabel",
+        "label": "Destination Label",
+        "value": "Destinations"
+      },
+      {
+        "component": "aem-content",
+        "name": "destinationUrl",
+        "label": "Destination Page"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "experienceLabel",
+        "label": "Experience Label",
+        "value": "Experiences"
+      },
+      {
+        "component": "aem-content",
+        "name": "experienceUrl",
+        "label": "Experience Page"
+      }
+    ]
+  },
+  {
+    "id": "hero-video-item",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Label"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "video",
+        "label": "Video",
+        "multi": false
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "poster",
+        "label": "Poster Image",
+        "multi": false
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "link",
+        "label": "Link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "focalDesktop",
+        "label": "Focal Point (Desktop)",
+        "value": "center"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "focalMobile",
+        "label": "Focal Point (Mobile)",
+        "value": "center"
       }
     ]
   },
@@ -720,7 +995,7 @@
         "value": ""
       },
       {
-        "component": "text",
+        "component": "richtext",
         "name": "title",
         "label": "Primary Main Title",
         "valueType": "string",
@@ -783,21 +1058,11 @@
         "value": ""
       },
       {
-        "component": "select",
+        "component": "boolean",
         "name": "ctas_primaryCtaOpenInNewTab",
         "label": "Primary CTA Open in new tab",
         "valueType": "string",
-        "value": "false",
-        "options": [
-          {
-            "name": "No",
-            "value": "false"
-          },
-          {
-            "name": "Yes",
-            "value": "true"
-          }
-        ]
+        "value": false
       },
       {
         "component": "aem-content",
@@ -813,21 +1078,11 @@
         "value": ""
       },
       {
-        "component": "select",
+        "component": "boolean",
         "name": "ctas_secondaryCtaOpenInNewTab",
         "label": "Secondary CTA Open in new tab",
         "valueType": "string",
-        "value": "false",
-        "options": [
-          {
-            "name": "No",
-            "value": "false"
-          },
-          {
-            "name": "Yes",
-            "value": "true"
-          }
-        ]
+        "value": false
       }
     ]
   },
@@ -1020,27 +1275,27 @@
       {
         "component": "reference",
         "name": "image",
-        "label": "Desktop Asset",
+        "label": "Desktop/Tablet Asset",
         "valueType": "string",
         "required": true
       },
       {
         "component": "text",
         "name": "imageAlt",
-        "label": "Desktop Asset Alt Text",
+        "label": "Desktop/Tablet Asset Alt Text",
         "valueType": "string",
         "required": true
       },
       {
         "component": "reference",
         "name": "imageMobile",
-        "label": "Tablet / Mobile Asset",
+        "label": "Mobile Asset",
         "valueType": "string"
       },
       {
         "component": "text",
         "name": "imageMobileAlt",
-        "label": "Tablet / Mobile Asset Alt Text",
+        "label": "Mobile Asset Alt Text",
         "valueType": "string"
       },
       {
