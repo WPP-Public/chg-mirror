@@ -1,5 +1,8 @@
 const CARD_MODEL = 'offers-carousel-item';
 
+// the stack in the design only has room for three cards, so any extra item is dropped
+const CARD_LIMIT = 3;
+
 function isEnabled(value: string): boolean {
   return ['true', 'yes', 'enabled'].includes(value.trim().toLowerCase());
 }
@@ -163,7 +166,8 @@ function applyStackState(cards: HTMLElement[], activeIndex: number): void {
 }
 
 function wireInteraction(root: HTMLElement, cards: HTMLElement[]): void {
-  let activeIndex = cards.length - 1;
+  // the first authored card leads the stack; Figma lists it last only because of paint order
+  let activeIndex = 0;
 
   const prevBtn = root.querySelector('.offers-carousel-nav-prev');
   const nextBtn = root.querySelector('.offers-carousel-nav-next');
@@ -223,7 +227,7 @@ export default function decorate(block: HTMLElement): void {
 
   const anchorId = idRow?.textContent?.trim();
   if (anchorId) block.id = anchorId.replace(/^#/, '');
-  idRow?.classList.add('offers-carousel-config');
+  idRow?.classList.add('offers-carousel-hidden');
 
   const copy = document.createElement('div');
   copy.className = 'offers-carousel-copy';
@@ -243,10 +247,15 @@ export default function decorate(block: HTMLElement): void {
   const cards = document.createElement('div');
   cards.className = 'offers-carousel-cards';
 
-  cardRows.forEach((row) => {
+  const rendered = cardRows.slice(0, CARD_LIMIT);
+  rendered.forEach((row) => {
     decorateCard(row);
     cards.append(row);
   });
+  cards.style.setProperty('--card-count', String(rendered.length));
+
+  // extras stay put so the editor keeps showing them in the content tree
+  cardRows.slice(CARD_LIMIT).forEach((row) => row.classList.add('offers-carousel-hidden'));
 
   const stage = document.createElement('div');
   stage.className = 'offers-carousel-stage';
@@ -257,5 +266,5 @@ export default function decorate(block: HTMLElement): void {
   layout.append(copy, stage);
   block.append(layout);
 
-  if (cardRows.length) wireInteraction(layout, cardRows);
+  if (rendered.length) wireInteraction(layout, rendered);
 }
