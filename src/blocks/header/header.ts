@@ -53,12 +53,12 @@ function getFragmentBasePath(): string {
   return parts.length ? `/${parts.join('/')}` : '';
 }
 
+// Text of an element excluding any nested <ul>/<ol>, so a label wrapped in a <p>
+// (e.g. <li><p>Label</p><ul>...</ul></li>, produced by the rich text editor) is still read.
 function directText(el: Element): string {
-  return [...el.childNodes]
-    .filter((node) => node.nodeType === Node.TEXT_NODE)
-    .map((node) => node.textContent ?? '')
-    .join(' ')
-    .trim();
+  const clone = el.cloneNode(true) as Element;
+  clone.querySelectorAll('ul, ol').forEach((list) => list.remove());
+  return (clone.textContent ?? '').trim();
 }
 
 function readLanguages(chromeSection: Element): NavLanguage[] {
