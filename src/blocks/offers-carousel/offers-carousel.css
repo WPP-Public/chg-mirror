@@ -4,6 +4,11 @@
     padding: 0;
 }
 
+/* authored-only fields (anchor id) stay in the DOM for the editor but are never rendered */
+.offers-carousel .offers-carousel-config {
+    display: none;
+}
+
 .offers-carousel .offers-carousel-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -27,6 +32,11 @@
     color: #1b364b;
 }
 
+.offers-carousel .offers-carousel-eyebrow p,
+.offers-carousel .offers-carousel-title p {
+    margin: 0;
+}
+
 .offers-carousel .offers-carousel-title {
     margin: 0;
     max-width: 345px;
@@ -38,11 +48,8 @@
     white-space: pre-line;
 }
 
-.offers-carousel .offers-carousel-title-line {
-    display: inline-block;
-}
-
-.offers-carousel .offers-carousel-title-line:nth-of-type(2) {
+/* a second authored paragraph is rendered as the indented second title line */
+.offers-carousel .offers-carousel-title p:nth-of-type(2) {
     margin-left: 32px;
 }
 
@@ -62,7 +69,6 @@
     height: 429px;
     margin: 0;
     padding: 0;
-    list-style: none;
 }
 
 .offers-carousel .offers-carousel-card {
@@ -96,6 +102,11 @@
     background: linear-gradient(180deg, rgb(0 0 0 / 32%) 0%, rgb(0 0 0 / 15%) 38%, rgb(0 0 0 / 44%) 100%);
 }
 
+.offers-carousel .offers-carousel-card-media > p {
+    margin: 0;
+    height: 100%;
+}
+
 .offers-carousel .offers-carousel-card picture,
 .offers-carousel .offers-carousel-card img {
     display: block;
@@ -121,6 +132,11 @@
     font-family: var(--body-font-family);
     font-size: 16px;
     line-height: 20px;
+}
+
+.offers-carousel .offers-carousel-card-title p,
+.offers-carousel .offers-carousel-card-eyebrow p {
+    margin: 0;
 }
 
 .offers-carousel .offers-carousel-card-body {
@@ -159,6 +175,11 @@
     align-items: center;
     justify-content: flex-end;
     margin-top: auto;
+}
+
+/* boolean flag cells and the paragraphs the anchors were lifted out of */
+.offers-carousel .offers-carousel-card-cta-flag {
+    display: none;
 }
 
 .offers-carousel .offers-carousel-card-cta {
@@ -290,7 +311,7 @@
         line-height: 48px;
     }
 
-    .offers-carousel .offers-carousel-title-line:nth-of-type(2) {
+    .offers-carousel .offers-carousel-title p:nth-of-type(2) {
         margin-left: 32px;
     }
 
