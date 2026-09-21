@@ -30,6 +30,7 @@
       "filters-grid",
       "offers-carousel",
       "text-with-cta",
+      "hero-video",
       "rte"
     ]
   },
@@ -174,12 +175,6 @@
     "id": "filters-grid-tab",
     "components": [
       "filters-grid-filter"
-    ]
-  },
-  {
-    "id": "hero-banner-with-toggle",
-    "components": [
-      "hero-banner-with-toggle-item"
     ]
   },
   {
