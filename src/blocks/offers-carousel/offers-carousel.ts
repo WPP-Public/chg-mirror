@@ -17,11 +17,6 @@ function isEnabled(value: string): boolean {
   return ['true', 'yes', 'enabled'].includes(value.trim().toLowerCase());
 }
 
-function getLinkTarget(cell: Element, linkIndex: number): boolean {
-  const values = [...cell.children].filter((child) => !child.querySelector('a'));
-  return isEnabled(textFromCell(values[linkIndex]));
-}
-
 function applyTarget(anchor: HTMLAnchorElement, openInNewTab?: boolean): void {
   if (!openInNewTab) return;
   anchor.target = '_blank';
@@ -54,22 +49,33 @@ interface CardLink {
   openInNewTab: boolean;
 }
 
-function getCardLink(
-  row: Element,
-  urlProperty: string,
-  labelProperty: string,
-  targetProperty: string,
-): CardLink | null {
-  const urlField = getField(row, urlProperty);
-  const href = urlField?.querySelector('a')?.getAttribute('href') || textFromCell(urlField);
-  const label = getFieldText(row, labelProperty);
-  if (!href || !label) return null;
+// each CTA is authored as url + label, then an always-present open-in-new-tab boolean that closes the group;
+// field collapse may merge url and label into a single anchor, so handle both shapes
+function parseCtas(cell?: Element | null): (CardLink | null)[] {
+  if (!cell) return [];
+  const ctas: (CardLink | null)[] = [];
+  let href = '';
+  let label = '';
 
-  return {
-    href,
-    label,
-    openInNewTab: isEnabled(getFieldText(row, targetProperty)),
-  };
+  [...cell.children].forEach((child) => {
+    const text = textFromCell(child);
+    if (/^(true|false)$/i.test(text)) {
+      ctas.push(href && label ? { href, label, openInNewTab: isEnabled(text) } : null);
+      href = '';
+      label = '';
+      return;
+    }
+    const anchor = child.querySelector('a');
+    if (anchor) {
+      href = anchor.getAttribute('href') || '';
+      const anchorText = anchor.textContent?.trim() || '';
+      if (anchorText && anchorText !== href) label = anchorText;
+    } else if (text) {
+      label = text;
+    }
+  });
+
+  return ctas;
 }
 
 interface CardData {
@@ -83,7 +89,7 @@ interface CardData {
 
 function parseCard(row: Element): CardData | null {
   const cells = [...row.children];
-  const mediaCell = getField(row, 'image') || cells[0];
+  const mediaCell = getField(row, 'media_cardImage') || cells[0];
   const contentCell = getField(row, 'content_cardDescription') || cells[1];
   const ctaCell = cells[2];
   const media = mediaCell?.querySelector('picture, img');
@@ -96,26 +102,7 @@ function parseCard(row: Element): CardData | null {
   const description =
     descriptionField?.innerHTML || paragraphs[2]?.innerHTML || contentCell?.querySelector('div')?.innerHTML || '';
 
-  const primary = getCardLink(row, 'ctas_primaryCta', 'ctas_primaryCtaText', 'ctas_primaryCtaOpenInNewTab');
-  const secondary = getCardLink(row, 'ctas_secondaryCta', 'ctas_secondaryCtaText', 'ctas_secondaryCtaOpenInNewTab');
-
-  if (!primary && !secondary && ctaCell) {
-    const links = [...ctaCell.querySelectorAll('a')];
-    const labels = links.map((link) => link.textContent?.trim() || '');
-    const legacyLinks = links.map((link, index) =>
-      labels[index]
-        ? { href: link.getAttribute('href') || '', label: labels[index], openInNewTab: getLinkTarget(ctaCell, index) }
-        : null,
-    );
-    return {
-      media,
-      eyebrow,
-      headline,
-      description,
-      primary: legacyLinks[0] || null,
-      secondary: legacyLinks[1] || null,
-    };
-  }
+  const [primary = null, secondary = null] = parseCtas(ctaCell);
 
   return {
     media,
