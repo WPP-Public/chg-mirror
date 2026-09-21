@@ -183,6 +183,12 @@
     ]
   },
   {
+    "id": "hero-video",
+    "components": [
+      "hero-video-item"
+    ]
+  },
+  {
     "id": "offers-carousel",
     "components": [
       "offers-carousel-item"
