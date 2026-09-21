@@ -1,10 +1,23 @@
 import { moveInstrumentation } from '@/app/scripts.js';
 import { createCarouselControls } from './carousel.js';
 
+function stripHtml(html: string): string {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = html;
+  return wrapper.textContent?.trim() ?? '';
+}
+
+// richtext fields (title/headline) author line breaks as <p> paragraphs or <br> inside a
+// single paragraph; flatten both into '\n'-joined plain text (CSS applies white-space: pre-line).
 function textFromCell(cell?: Element | null): string {
   if (!cell) return '';
-  const textNodes = [...cell.children].map((child) => child.textContent?.trim() ?? '').filter(Boolean);
-  return textNodes.length > 1 ? textNodes.join('\n') : (cell.textContent?.trim() ?? '');
+  const paragraphs = [...cell.querySelectorAll('p')];
+  const sources = paragraphs.length ? paragraphs.map((p) => p.innerHTML) : [cell.innerHTML];
+  const lines = sources
+    .flatMap((html) => html.split(/<br\s*\/?>/i))
+    .map(stripHtml)
+    .filter(Boolean);
+  return lines.length ? lines.join('\n') : (cell.textContent?.trim() ?? '');
 }
 
 function textFromPart(cell: Element | null | undefined, index: number): string {
@@ -98,8 +111,9 @@ function getCardFields(row: Element): CardFields {
         : null,
     href: cta.href,
     ctaLabel: textFromCell(ctaLabelCell || fallbackCtaLabelCell) || cta.label,
-    openInNewTab: isEnabled(openInNewTabCell || cells[isNewModelOrder ? 6 : linkIndex + 3], false),
-    darkOverlay: isEnabled(darkOverlayCell || cells[isNewModelOrder ? 7 : linkIndex + 2], true),
+    // cell order after the CTA link is: ctaName, openInNewTab, darkOverlay
+    openInNewTab: isEnabled(openInNewTabCell || cells[isNewModelOrder ? 6 : linkIndex + 2], false),
+    darkOverlay: isEnabled(darkOverlayCell || cells[isNewModelOrder ? 7 : linkIndex + 3], true),
   };
 }
 
