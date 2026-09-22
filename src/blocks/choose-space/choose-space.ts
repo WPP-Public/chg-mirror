@@ -1,4 +1,5 @@
 import { moveInstrumentation } from '@/app/scripts.js';
+import { resolveDAMUrl } from '@/utils/env.js';
 
 /*
  * choose-space
@@ -124,12 +125,15 @@ function buildVideo(
   mobileCell: Element | null | undefined,
   poster: string,
 ): HTMLVideoElement | null {
-  const src = cell?.querySelector('a')?.getAttribute('href');
-  if (!src) return null;
+  const href = cell?.querySelector('a')?.getAttribute('href');
+  if (!href) return null;
 
   const video = document.createElement('video');
   video.className = 'choose-space-media';
   video.muted = true;
+  // of the four, `muted` is the only property that does not reflect to an attribute,
+  // and both the autoplay policy and the editor's re-parse of the markup read attributes
+  video.defaultMuted = true;
   video.loop = true;
   video.playsInline = true;
   video.preload = 'none';
@@ -137,15 +141,15 @@ function buildVideo(
   const description = altOf(cell);
   if (description) video.setAttribute('aria-label', description);
 
-  const mobileSrc = mobileCell?.querySelector('a')?.getAttribute('href');
-  if (mobileSrc) {
+  const mobileHref = mobileCell?.querySelector('a')?.getAttribute('href');
+  if (mobileHref) {
     const mobile = document.createElement('source');
-    mobile.src = mobileSrc;
+    mobile.src = resolveDAMUrl(mobileHref);
     mobile.media = MOBILE_MEDIA_QUERY;
     video.append(mobile);
   }
   const desktop = document.createElement('source');
-  desktop.src = src;
+  desktop.src = resolveDAMUrl(href);
   video.append(desktop);
 
   return video;
@@ -446,7 +450,9 @@ export default function decorate(block: HTMLElement): void {
     spaces.forEach((space, i) => {
       const active = i === selected;
       space.panel.classList.toggle('is-active', active);
-      space.panel.hidden = !active;
+      // the panel keeps its grid cell so it can fade out; `inert` stops it taking
+      // focus during the crossfade, before `visibility` removes it
+      space.panel.inert = !active;
       space.tab.classList.toggle('is-active', active);
       space.tab.setAttribute('aria-selected', String(active));
       space.tab.tabIndex = active ? 0 : -1;
@@ -486,8 +492,29 @@ export default function decorate(block: HTMLElement): void {
   });
 
   select(0, false);
+  // armed a frame later so the first space appears instantly instead of fading in
+  requestAnimationFrame(() => stage.classList.add('is-ready'));
 
   const carousel = createCarousel(tablist, nav);
+
+  // `preload="none"` keeps the videos off the critical path; they start buffering
+  // once the block is near the viewport, so switching space is not a cold start
+  const videos = spaces.map((space) => space.video).filter((video): video is HTMLVideoElement => video !== null);
+  const preloader = videos.length
+    ? new IntersectionObserver(
+        (entries, observer) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          observer.disconnect();
+          videos.forEach((video) => {
+            video.preload = 'auto';
+            // a video already playing is loading anyway, and load() would restart it
+            if (video.paused) video.load();
+          });
+        },
+        { rootMargin: '200px' },
+      )
+    : null;
+  preloader?.observe(block);
 
   // the editor replaces the block element on every item change, so the observer
   // must not outlive the DOM it was measuring
@@ -496,6 +523,7 @@ export default function decorate(block: HTMLElement): void {
     const watcher = new MutationObserver(() => {
       if (block.isConnected) return;
       carousel.disconnect();
+      preloader?.disconnect();
       watcher.disconnect();
     });
     watcher.observe(parent, { childList: true });
