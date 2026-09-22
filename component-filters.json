@@ -31,7 +31,9 @@
       "offers-carousel",
       "text-with-cta",
       "hero-video",
-      "rte"
+      "hero-destination",
+      "rte",
+      "choose-space"
     ]
   },
   {
@@ -127,6 +129,12 @@
     ]
   },
   {
+    "id": "choose-space",
+    "components": [
+      "space-option"
+    ]
+  },
+  {
     "id": "columns",
     "components": [
       "column"
@@ -202,6 +210,12 @@
     "id": "footer-bottom",
     "components": [
       "footer-utility-link"
+    ]
+  },
+  {
+    "id": "hero-destination",
+    "components": [
+      "hero-destination-item"
     ]
   },
   {
