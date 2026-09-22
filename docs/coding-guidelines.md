@@ -8,6 +8,7 @@ Mandatory coding style rules for this repository. Read this file before writing 
 - Use ES6+ features (arrow functions, destructuring, etc.)
 - ESLint flat config (`eslint.config.js`) + Prettier (`prettier.config.js`) — no Airbnb config
 - Use the `@/*` path alias (maps to `src/*`) for cross-module imports; omit `.ts` extensions
+- Resolve every DAM asset URL you put into a `src`/`href` through `resolveDAMUrl()` (`src/utils/env.ts`) — authored references arrive as AEM paths and only the publish origin in `src/configs/env.ts` serves them; the EDS origin returns 404. Applies to video `<source>`s in particular, since images come through the pipeline already optimized
 - Use Unix line endings (LF)
 
 ## CSS
