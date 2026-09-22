@@ -1,5 +1,6 @@
 // src/blocks/hero-destination/lib/dom-builder.ts
 import { moveInstrumentation } from '@/app/scripts.js';
+import { buildMedia } from './media';
 import type { HeroDestinationItem } from './types';
 
 export function buildSlide(item: HeroDestinationItem, index: number): HTMLLIElement {
@@ -8,13 +9,9 @@ export function buildSlide(item: HeroDestinationItem, index: number): HTMLLIElem
   slide.setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
   moveInstrumentation(item.sourceRow, slide);
 
-  const media = document.createElement('div');
-  media.className = 'hero-destination-media';
-  const img = item.picture.querySelector('img');
-  if (img) img.alt = item.imageAlt;
-  media.append(item.picture);
+  const media = buildMedia(item);
 
-  const heading = document.createElement('h1');
+  const heading = document.createElement('h2');
   heading.className = 'hero-destination-heading';
   heading.textContent = item.heading;
 
