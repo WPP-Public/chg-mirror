@@ -21,6 +21,19 @@ function cellText(cell?: Element | null): string {
   return cell?.textContent?.trim() ?? '';
 }
 
+// Looks a cell up by its authored field name (data-aue-prop) rather than position, so parsing
+// keeps working if a conditional field renders an empty/absent cell (e.g. imageMobile/videoMobile
+// left blank) and shifts positional indices. Falls back to `fallbackIndex` when the attribute is
+// missing (e.g. content authored/copied before instrumentation was present).
+function cellByProp(cells: HTMLElement[], property: string, fallbackIndex: number): HTMLElement | undefined {
+  return (
+    cells.find(
+      (cell) =>
+        cell.getAttribute('data-aue-prop') === property || !!cell.querySelector(`[data-aue-prop="${property}"]`),
+    ) ?? cells[fallbackIndex]
+  );
+}
+
 function cellVideoUrl(cell?: Element | null): string {
   const href = cell?.querySelector('a')?.getAttribute('href') ?? '';
   return href ? resolveDAMUrl(href) : '';
@@ -50,25 +63,30 @@ export function parseItems(itemRows: HTMLElement[]): HeroDestinationItem[] {
 }
 
 // Current model: mediaType, image, imageMobile, imageAlt, video, videoMobile, heading (7 cells).
+// Cells are looked up by data-aue-prop (see cellByProp) since an empty conditional field can
+// render an absent/empty cell and shift positional indices — e.g. after switching mediaType or
+// leaving the optional mobile fields blank.
 // Content authored before the mediaType/mobile fields were added (image [+ imageAlt] + heading,
 // 2-3 cells) is parsed as an image item: the last cell is the heading, the first cell containing
 // a <picture> is the image, and any other plain-text cell is the alt text.
 function parseItem(cells: HTMLElement[], row: HTMLElement): HeroDestinationItem | null {
   if (cells.length >= 7) {
-    const heading = cellText(cells[6]);
+    const mediaTypeCell = cellByProp(cells, 'mediaType', 0);
+    const headingCell = cellByProp(cells, 'heading', 6);
+    const heading = cellText(headingCell);
     if (!heading) return null;
 
-    if (cellText(cells[0]).toLowerCase() === 'video') {
-      const desktopVideoUrl = cellVideoUrl(cells[4]);
+    if (cellText(mediaTypeCell).toLowerCase() === 'video') {
+      const desktopVideoUrl = cellVideoUrl(cellByProp(cells, 'video', 4));
       if (!desktopVideoUrl) return null;
-      const mobileVideoUrl = cellVideoUrl(cells[5]) || desktopVideoUrl;
+      const mobileVideoUrl = cellVideoUrl(cellByProp(cells, 'videoMobile', 5)) || desktopVideoUrl;
       return { mediaType: 'video', desktopVideoUrl, mobileVideoUrl, heading, sourceRow: row };
     }
 
-    const desktopPicture = cells[1]?.querySelector('picture');
+    const desktopPicture = cellByProp(cells, 'image', 1)?.querySelector('picture');
     if (!desktopPicture) return null;
-    const mobilePicture = cells[2]?.querySelector('picture') ?? null;
-    const imageAlt = cellText(cells[3]);
+    const mobilePicture = cellByProp(cells, 'imageMobile', 2)?.querySelector('picture') ?? null;
+    const imageAlt = cellText(cellByProp(cells, 'imageAlt', 3));
     return { mediaType: 'image', desktopPicture, mobilePicture, imageAlt, heading, sourceRow: row };
   }
 
