@@ -109,7 +109,6 @@
           "name": "image",
           "label": "Image (Desktop)",
           "multi": false,
-          "required": true,
           "condition": {
             "===": [{ "var": "mediaType" }, "image"]
           }
@@ -140,7 +139,6 @@
           "name": "video",
           "label": "Video (Desktop)",
           "multi": false,
-          "required": true,
           "condition": {
             "===": [{ "var": "mediaType" }, "video"]
           }
