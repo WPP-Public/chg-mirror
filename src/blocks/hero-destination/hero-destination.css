@@ -16,9 +16,42 @@
     background: #000;
 }
 
-/* Authoring: cap height to prevent layout issues in the Universal Editor */
+/* Authoring: stack every slide statically (instead of only showing the active one) so
+   authors can see and click any item to select/edit it, including newly added items. */
 .adobe-ue-edit .hero-destination {
-    max-height: 1080px;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+}
+
+.adobe-ue-edit .hero-destination-track {
+    position: static;
+    height: auto;
+}
+
+.adobe-ue-edit .hero-destination-slide {
+    position: relative;
+    inset: unset;
+    min-height: 480px;
+}
+
+.adobe-ue-edit .hero-destination-slide[aria-hidden='true'] {
+    pointer-events: auto;
+}
+
+.adobe-ue-edit .hero-destination-media {
+    position: relative;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.adobe-ue-edit .hero-destination-heading {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.adobe-ue-edit .hero-destination-dots {
+    display: none;
 }
 
 .hero-destination-overlay {
