@@ -221,6 +221,7 @@ footer {
     }
 
     .footer-contact {
+        display: flex;
         grid-area: contact;
         flex-direction: column;
         align-items: stretch;
