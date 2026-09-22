@@ -96,7 +96,8 @@ function getCardFields(row: Element): CardFields {
   const imageAltCell = getCellByProp(cells, 'imageAlt');
   const isNewModelOrder = !!ctaLinkCell;
   const fallbackCtaLinkCell = isNewModelOrder ? cells[5] : cells[linkIndex];
-  const fallbackCtaLabelCell = isNewModelOrder ? cells[4] : cells[linkIndex + 1];
+  // ctaName is authored right before ctaLink, not after it
+  const fallbackCtaLabelCell = isNewModelOrder ? cells[4] : cells[linkIndex - 1];
   const hasLegacyAltField = !isNewModelOrder && linkIndex >= 5;
   const cta = getLinkFromCell(ctaLinkCell || fallbackCtaLinkCell);
 
@@ -111,9 +112,9 @@ function getCardFields(row: Element): CardFields {
         : null,
     href: cta.href,
     ctaLabel: textFromCell(ctaLabelCell || fallbackCtaLabelCell) || cta.label,
-    // cell order after the CTA link is: ctaName, openInNewTab, darkOverlay
-    openInNewTab: isEnabled(openInNewTabCell || cells[isNewModelOrder ? 6 : linkIndex + 2], false),
-    darkOverlay: isEnabled(darkOverlayCell || cells[isNewModelOrder ? 7 : linkIndex + 3], true),
+    // cell order after the CTA link is: openInNewTab, darkOverlay
+    openInNewTab: isEnabled(openInNewTabCell || cells[isNewModelOrder ? 6 : linkIndex + 1], false),
+    darkOverlay: isEnabled(darkOverlayCell || cells[isNewModelOrder ? 7 : linkIndex + 2], true),
   };
 }
 
