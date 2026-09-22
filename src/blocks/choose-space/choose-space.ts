@@ -264,6 +264,17 @@ function buildSpace(row: Element, blockId: string, index: number): Space | null 
   tab.setAttribute('aria-controls', panelId);
   tab.dataset.index = String(index);
 
+  const caption = label || (authoring ? `Space ${index + 1}` : '');
+  if (caption) {
+    // the label precedes the image in the design, so it leads in the DOM too
+    const captionElement = document.createElement('span');
+    captionElement.className = 'choose-space-tab-label';
+    captionElement.textContent = caption;
+    tab.append(captionElement);
+  } else {
+    tab.setAttribute('aria-label', `Space ${index + 1}`);
+  }
+
   if (thumbnail) {
     const clone = thumbnail.cloneNode(true) as Element;
     // the clone would otherwise carry a copy of the item's data-aue-* attributes,
@@ -274,20 +285,6 @@ function buildSpace(row: Element, blockId: string, index: number): Space | null 
     // the label already names the tab, so the thumbnail is decorative here
     clone.querySelector('img')?.setAttribute('alt', '');
     tab.append(clone);
-  }
-  if (label) {
-    const caption = document.createElement('span');
-    caption.className = 'choose-space-tab-label';
-    caption.textContent = label;
-    tab.append(caption);
-  } else if (authoring) {
-    // an unlabelled tab would collapse to nothing and leave the new space unclickable
-    const caption = document.createElement('span');
-    caption.className = 'choose-space-tab-label';
-    caption.textContent = `Space ${index + 1}`;
-    tab.append(caption);
-  } else {
-    tab.setAttribute('aria-label', `Space ${index + 1}`);
   }
 
   return { panel, tab, video: isVideo ? (media as HTMLVideoElement | null) : null };
