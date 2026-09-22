@@ -186,6 +186,33 @@
     ]
   },
   {
+    "id": "footer",
+    "components": [
+      "footer-contact",
+      "newsletter-form",
+      "footer-links",
+      "footer-bottom"
+    ]
+  },
+  {
+    "id": "footer-contact",
+    "components": [
+      "footer-social-link"
+    ]
+  },
+  {
+    "id": "footer-links",
+    "components": [
+      "footer-link"
+    ]
+  },
+  {
+    "id": "footer-bottom",
+    "components": [
+      "footer-utility-link"
+    ]
+  },
+  {
     "id": "hero-destination",
     "components": [
       "hero-destination-item"
