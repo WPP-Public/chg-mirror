@@ -99,10 +99,10 @@ body.appear {
 }
 
 /* TEMP: header/footer hidden, remove this rule to restore */
-header,
+/* header,
 footer {
     display: none;
-}
+} */
 
 header {
     height: var(--nav-height);
