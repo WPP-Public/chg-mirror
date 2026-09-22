@@ -35,6 +35,12 @@
     ]
   },
   {
+    "id": "footer-page",
+    "components": [
+      "footer"
+    ]
+  },
+  {
     "id": "richtext",
     "rte": {
       "toolbar": {
