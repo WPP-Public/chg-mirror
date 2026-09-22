@@ -85,7 +85,9 @@
         "offers-carousel",
         "text-with-cta",
         "hero-video",
-        "rte"
+        "hero-destination",
+        "rte",
+        "choose-space"
       ]
     },
     {
