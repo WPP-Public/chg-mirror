@@ -1,8 +1,9 @@
 /* choose-space
    Figma: desktop 6047:27021 (1440), tablet 6048:28586 (834), mobile 6048:30207 (393).
-   Desktop spacing is written as calc(N * var(--fluid-unit)) where N is the raw
-   Figma pixel value, so the module matches the artboard exactly at 1440 and stays
-   proportional either side of it. Everything nests under the block class, so no
+   The hero is full-bleed, so its desktop spacing is written as calc(N * var(--fluid-unit))
+   where N is the raw Figma pixel value and the copy stays proportional to the viewport.
+   The selector below it is the opposite: a fixed 848 band centred in the viewport, so its
+   columns keep their drawn size. Everything nests under the block class, so no
    rule can leak to another block. */
 .choose-space {
     display: flex;
@@ -14,11 +15,15 @@
 
     .choose-space-stage {
         position: relative;
-        display: flex;
+        /* one grid area for every panel so the outgoing and incoming space overlap
+           during the crossfade instead of briefly sitting side by side */
+        display: grid;
+        grid-template-areas: 'stage';
         min-width: 0;
     }
 
     .choose-space-panel {
+        grid-area: stage;
         position: relative;
         display: flex;
         flex-direction: column;
@@ -29,6 +34,13 @@
         aspect-ratio: 393 / 660;
         overflow: hidden;
         background-color: var(--color-text-main-heading);
+        opacity: 0;
+        visibility: hidden;
+
+        &.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
 
         &[hidden] {
             display: none;
@@ -42,6 +54,23 @@
         @media (width >= 1200px) {
             /* Figma desktop 1440x680 */
             aspect-ratio: 1440 / 680;
+        }
+    }
+
+    /* the crossfade is armed only once the first space has been painted, so the
+       hero LCP is never held back by a fade on load */
+    @media (prefers-reduced-motion: no-preference) {
+        .choose-space-stage.is-ready .choose-space-panel {
+            /* the delay keeps the outgoing panel painted until its fade has finished */
+            transition:
+                opacity 320ms ease,
+                visibility 0s linear 320ms;
+
+            &.is-active {
+                transition:
+                    opacity 320ms ease,
+                    visibility 0s;
+            }
         }
     }
 
@@ -198,6 +227,12 @@
         @media (width >= 1200px) {
             flex-direction: row;
             align-items: flex-start;
+            /* Figma 1440 runs the content from x=296 to x=1144. Centring that 848
+               band beats fluid gutters: the columns keep their drawn size at any
+               viewport instead of scaling with it */
+            width: 100%;
+            max-width: 848px;
+            margin-inline: auto;
         }
     }
 
@@ -210,10 +245,9 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            /* Figma places the title block at x=296 with a width of 288, so the
-               column ends exactly where the tab list starts at x=584 */
-            flex: 0 0 calc(584 * var(--fluid-unit));
-            padding-inline-start: calc(296 * var(--fluid-unit));
+            /* Figma title block is 288 wide, so the column ends exactly where the
+               tab list starts and the remaining 560 holds three thumbnails */
+            flex: 0 0 288px;
         }
     }
 
@@ -272,6 +306,9 @@
         min-width: 0;
         column-gap: var(--dimension-layout-carousel-item-gap-xl);
         padding-inline: var(--dimension-layout-module-padding-inline-s);
+        /* the snapport ignores the container's own padding, so a tab snapped to the
+           start would sit flush against the viewport edge without this mirror */
+        scroll-padding-inline: var(--dimension-layout-module-padding-inline-s);
         overflow-x: auto;
         overscroll-behavior-inline: contain;
         scroll-snap-type: inline mandatory;
@@ -283,40 +320,39 @@
         }
 
         @media (width >= 1200px) {
-            column-gap: calc(40 * var(--fluid-unit));
             padding-inline: 0;
-            /* Figma's listing ends at x=1144, leaving 296 clear; as scroll padding
-               it also means three items fit exactly without becoming a carousel */
-            padding-inline-end: calc(296 * var(--fluid-unit));
+            scroll-padding-inline: 0;
         }
     }
 
     .choose-space-tab {
-        position: relative;
         flex: 0 0 auto;
-        display: block;
-        /* Figma mobile 140x110, tablet 160x120, desktop 160x147 */
+        /* Figma "space thumbnail": label, 16px gap, then the image - the label sits
+           above the picture, not over it */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        row-gap: var(--dimension-spacing-general-m);
+        /* Figma mobile 140 wide, tablet and desktop 160 */
         width: 140px;
         padding: 0;
         border: 0;
         background: none;
-        color: var(--color-text-main-inverse-heading);
+        color: var(--color-text-main-body);
+        text-align: start;
         cursor: pointer;
         scroll-snap-align: start;
 
         @media (width >= 768px) {
             width: 160px;
         }
-
-        @media (width >= 1200px) {
-            width: calc(160 * var(--fluid-unit));
-        }
     }
 
     .choose-space-tab-media {
         display: block;
         width: 100%;
-        aspect-ratio: 140 / 110;
+        /* Figma image-ratio: 140x105 mobile, 160x120 tablet and desktop */
+        aspect-ratio: 4 / 3;
         overflow: hidden;
         background-color: var(--color-text-main-heading);
         /* unselected tabs read as a muted set behind the active one */
@@ -328,14 +364,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        @media (width >= 768px) {
-            aspect-ratio: 160 / 120;
-        }
-
-        @media (width >= 1200px) {
-            aspect-ratio: 160 / 147;
         }
     }
 
@@ -351,15 +379,10 @@
     }
 
     .choose-space-tab-label {
-        position: absolute;
-        inset-block-end: var(--dimension-spacing-general-s);
-        inset-inline-start: var(--dimension-spacing-general-s);
         font-family: var(--type-font-family-body);
-        font-size: var(--typography-fontsize-body-s);
+        font-size: var(--typography-fontsize-body-m);
         font-weight: var(--type-font-weight-body-reg);
-        line-height: var(--typography-line-height-body-sm);
-        text-transform: uppercase;
-        text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
+        line-height: var(--typography-line-height-body-md);
     }
 
     /* ---------- carousel controls ---------- */

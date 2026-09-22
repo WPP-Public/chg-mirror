@@ -31,6 +31,7 @@
       "offers-carousel",
       "text-with-cta",
       "hero-video",
+      "hero-destination",
       "rte",
       "choose-space"
     ]
@@ -182,6 +183,39 @@
     "id": "filters-grid-tab",
     "components": [
       "filters-grid-filter"
+    ]
+  },
+  {
+    "id": "footer",
+    "components": [
+      "footer-contact",
+      "newsletter-form",
+      "footer-links",
+      "footer-bottom"
+    ]
+  },
+  {
+    "id": "footer-contact",
+    "components": [
+      "footer-social-link"
+    ]
+  },
+  {
+    "id": "footer-links",
+    "components": [
+      "footer-link"
+    ]
+  },
+  {
+    "id": "footer-bottom",
+    "components": [
+      "footer-utility-link"
+    ]
+  },
+  {
+    "id": "hero-destination",
+    "components": [
+      "hero-destination-item"
     ]
   },
   {

@@ -63,6 +63,7 @@
     --color-icon-main-primary: #1b364b;
     --color-icon-action-default: #1b364b;
     --color-icon-on-action-default: #ffffff;
+    --color-icon-action-opaque-inverse: #ffffff80;
 
     /* color / stroke */
     --color-stroke-main-primary: #898987;
