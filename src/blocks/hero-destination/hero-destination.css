@@ -1,0 +1,113 @@
+/* src/blocks/hero-destination/hero-destination.css */
+
+.hero-destination-container .hero-destination-wrapper {
+    max-width: unset;
+    padding: 0;
+}
+
+.hero-destination {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* fallback */
+    height: 100svh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    background: #000;
+}
+
+/* Authoring: cap height to prevent layout issues in the Universal Editor */
+.adobe-ue-edit .hero-destination {
+    max-height: 1080px;
+}
+
+.hero-destination-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgb(0 0 0 / 40%);
+    pointer-events: none;
+}
+
+.hero-destination-track {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-destination-slide {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+.hero-destination-slide.is-active {
+    z-index: 1;
+    opacity: 1;
+}
+
+.hero-destination-media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+}
+
+.hero-destination-media picture,
+.hero-destination-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-destination-heading {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0;
+    padding-inline: var(--dimension-layout-module-padding-inline-xs);
+    color: var(--color-text-main-inverse-heading);
+    font-family: var(--type-font-family-heading);
+    font-size: var(--typography-fontsize-heading-h2);
+    line-height: var(--typography-line-height-heading-h2);
+    font-weight: var(--type-font-weight-heading);
+    text-align: center;
+}
+
+.hero-destination-dots {
+    position: absolute;
+    z-index: 3;
+    bottom: var(--dimension-spacing-general-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--dimension-spacing-general-xs);
+}
+
+.hero-destination-dot {
+    width: var(--dimension-spacing-general-xs);
+    height: var(--dimension-spacing-general-xs);
+    padding: 0;
+    border: none;
+    border-radius: var(--corner-radius-round);
+    background: var(--color-icon-action-opaque-inverse);
+    cursor: pointer;
+}
+
+.hero-destination-dot.is-active {
+    background: var(--color-icon-on-action-default);
+}
+
+@media (width >= 768px) {
+    .hero-destination-heading {
+        padding-inline: var(--dimension-layout-module-padding-inline-s);
+    }
+}

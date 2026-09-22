@@ -31,6 +31,7 @@
       "offers-carousel",
       "text-with-cta",
       "hero-video",
+      "hero-destination",
       "rte"
     ]
   },
@@ -175,6 +176,12 @@
     "id": "filters-grid-tab",
     "components": [
       "filters-grid-filter"
+    ]
+  },
+  {
+    "id": "hero-destination",
+    "components": [
+      "hero-destination-item"
     ]
   },
   {
