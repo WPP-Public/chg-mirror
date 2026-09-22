@@ -1,6 +1,7 @@
 // src/blocks/hero-destination/lib/carousel-controller.ts
 // Drives active slide/dot state and autoplay timing; visual positioning is delegated to the
 // chosen transition effect, so this class stays agnostic of how slides/dots were built.
+import { isUniversalEditor } from '@/utils/env.js';
 import type { EffectController } from './effects/types';
 
 export interface CarouselControllerOptions {
@@ -35,7 +36,12 @@ export class CarouselController {
     this.intervalMs = intervalSeconds * 1000;
     this.loop = loop;
     this.effect = effect;
-    this.canAutoplay = autoplay && slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Autoplay would otherwise rotate the item an author is editing out from under them.
+    this.canAutoplay =
+      autoplay &&
+      slides.length > 1 &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      !isUniversalEditor();
   }
 
   /** Activates the first slide and starts autoplay (if eligible); wires tab-visibility handling. */
