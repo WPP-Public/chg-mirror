@@ -19,11 +19,7 @@ header:has(.header-menu-panel.is-open) {
     background: var(--site-header-surface);
 }
 
-/* A full-bleed hero-banner as the first section should fill the viewport with the
-   header floating transparently on top of it instead of pushing it down. Absolute
-   (not sticky/fixed) removes the header from flow so the hero can start at the very
-   top, while the header still scrolls away with the page like any other content. */
-body:has(main > div:first-child .hero-banner) header {
+header {
     position: absolute;
     top: 0;
     left: 0;
@@ -54,8 +50,12 @@ body:has(main > div:first-child .hero-banner) header {
 
 .header-menu-toggle {
     justify-self: start;
-    width: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: auto;
     height: 32px;
+    color: #fff;
 }
 
 .header-menu-icon,
@@ -98,6 +98,22 @@ body:has(main > div:first-child .hero-banner) header {
 
 .header-menu-toggle[aria-expanded='true'] .header-menu-icon::after {
     transform: translateY(0) rotate(-45deg);
+}
+
+.header-menu-toggle[aria-expanded='true'] {
+    color: #1b364b;
+}
+
+.header-menu-toggle-label {
+    display: none;
+    font-family: var(--type-font-family-cta, sans-serif);
+    font-size: var(--typography-fontsize-body-s, 14px);
+    line-height: var(--typography-line-height-body-sm, 16px);
+    text-transform: uppercase;
+}
+
+.header-menu-toggle[aria-expanded='true'] .header-menu-toggle-label {
+    display: inline;
 }
 
 .header-logo {
