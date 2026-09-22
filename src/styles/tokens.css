@@ -31,6 +31,10 @@
     --breakpoint-tablet-max: 1199px;
     --breakpoint-desktop-min: 1200px;
 
+    /* multiplier for viewport-proportional spacing; 1px below desktop so
+       calc(N * var(--fluid-unit)) equals N pixels there. See the desktop block. */
+    --fluid-unit: 1px;
+
     /* color / surface */
     --color-surface-page: #ffffff;
     --color-surface-primary-default: #ffffff;
@@ -130,7 +134,9 @@
     --dimension-spacing-general-6xl: 120px;
     --dimension-spacing-eyebrow-to-title: 12px;
     --dimension-spacing-eyebrow-to-text: 12px;
-    --dimension-spacing-title-to-content: 12px;
+    /* Figma `dimension/spacing/title-to-content`. A separate variable from
+       `heading-to-content` below - do not merge them. */
+    --dimension-spacing-title-to-content: 32px;
     --dimension-spacing-heading-to-content: 32px;
     --dimension-spacing-content-to-bottom-cta: 48px;
     --dimension-spacing-stack-to-stack: 48px;
@@ -168,6 +174,13 @@
     --dimension-layout-carousel-item-gap-m: 12px;
     --dimension-layout-carousel-item-gap-s: 4px;
     --dimension-layout-carousel-item-gap-xl: 32px;
+
+    /* dimension / layout / margin */
+    --dimension-layout-margin-m: 40px;
+
+    /* dimension / viewport (the Figma artboard the breakpoint is sampled from;
+       unitless so it can divide a length in calc()) */
+    --dimension-viewport-width: 393;
 
     /* dimension / layout / modal (mobile default) */
     --dimension-layout-modal-padding-block: 20px;
@@ -259,11 +272,17 @@
 
         --dimension-spacing-eyebrow-to-title: 14px;
         --dimension-spacing-eyebrow-to-text: 16px;
-        --dimension-spacing-title-to-content: 14px;
+        --dimension-spacing-title-to-content: 48px;
         --dimension-spacing-heading-to-content: 40px;
         --dimension-spacing-content-to-bottom-cta: 56px;
         --dimension-spacing-stack-to-stack: 64px;
         --dimension-spacing-gallery-to-preview: 16px;
+
+        /* dimension / viewport (tablet artboard) */
+        --dimension-viewport-width: 834;
+
+        /* dimension / layout / carousel (tablet) */
+        --dimension-layout-carousel-item-gap-xl: 40px;
 
         /* dimension / layout / module (tablet) */
         --dimension-layout-module-padding-top: 112px;
@@ -324,6 +343,7 @@
         --typography-line-height-body-md: 22px;
 
         --dimension-spacing-eyebrow-to-text: 20px;
+        --dimension-spacing-title-to-content: 56px;
         --dimension-spacing-heading-to-content: 48px;
         --dimension-spacing-content-to-bottom-cta: 64px;
         --dimension-spacing-stack-to-stack: 72px;
@@ -331,6 +351,12 @@
 
         /* general spacing scale is breakpoint-independent except this one step */
         --dimension-spacing-general-4xl: 145px;
+
+        /* dimension / viewport (desktop artboard) */
+        --dimension-viewport-width: 1440;
+
+        /* dimension / layout / margin (desktop) */
+        --dimension-layout-margin-m: 80px;
 
         /* dimension / layout / module (desktop; padding-xl is non-monotonic
            per Figma - 56px mobile, 40px tablet, 240px desktop, all confirmed
@@ -362,5 +388,18 @@
         /* component / toggle (desktop) */
         --component-toogle-selector-dot: 24px;
         --component-toogle-width: 80px;
+
+        /* component / button (desktop; Figma's shared Button defines 16 at 1440.
+           The mobile and tablet steps were transcribed but this one was missed) */
+        --component-button-padding-block: 16px;
+
+        /* Desktop spacing scales with the viewport instead of stepping: a value
+           written as calc(N * var(--fluid-unit)) renders exactly N Figma pixels
+           at the 1440 artboard and stays proportional either side of it, with no
+           upper clamp. Uses vw, not cqi: cqi subtracts the classic scrollbar and
+           would render 292.9px where the design asks for 296px on a 1440 device.
+           Only ever multiply it into padding, margin or gap - feeding it into
+           width would reintroduce the usual 100vw overflow. */
+        --fluid-unit: calc(100vw / var(--dimension-viewport-width));
     }
 }
