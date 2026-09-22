@@ -14,11 +14,15 @@
 
     .choose-space-stage {
         position: relative;
-        display: flex;
+        /* one grid area for every panel so the outgoing and incoming space overlap
+           during the crossfade instead of briefly sitting side by side */
+        display: grid;
+        grid-template-areas: 'stage';
         min-width: 0;
     }
 
     .choose-space-panel {
+        grid-area: stage;
         position: relative;
         display: flex;
         flex-direction: column;
@@ -29,6 +33,13 @@
         aspect-ratio: 393 / 660;
         overflow: hidden;
         background-color: var(--color-text-main-heading);
+        opacity: 0;
+        visibility: hidden;
+
+        &.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
 
         &[hidden] {
             display: none;
@@ -42,6 +53,23 @@
         @media (width >= 1200px) {
             /* Figma desktop 1440x680 */
             aspect-ratio: 1440 / 680;
+        }
+    }
+
+    /* the crossfade is armed only once the first space has been painted, so the
+       hero LCP is never held back by a fade on load */
+    @media (prefers-reduced-motion: no-preference) {
+        .choose-space-stage.is-ready .choose-space-panel {
+            /* the delay keeps the outgoing panel painted until its fade has finished */
+            transition:
+                opacity 320ms ease,
+                visibility 0s linear 320ms;
+
+            &.is-active {
+                transition:
+                    opacity 320ms ease,
+                    visibility 0s;
+            }
         }
     }
 
@@ -272,6 +300,9 @@
         min-width: 0;
         column-gap: var(--dimension-layout-carousel-item-gap-xl);
         padding-inline: var(--dimension-layout-module-padding-inline-s);
+        /* the snapport ignores the container's own padding, so a tab snapped to the
+           start would sit flush against the viewport edge without this mirror */
+        scroll-padding-inline: var(--dimension-layout-module-padding-inline-s);
         overflow-x: auto;
         overscroll-behavior-inline: contain;
         scroll-snap-type: inline mandatory;
@@ -285,6 +316,7 @@
         @media (width >= 1200px) {
             column-gap: calc(40 * var(--fluid-unit));
             padding-inline: 0;
+            scroll-padding-inline: 0;
             /* Figma's listing ends at x=1144, leaving 296 clear; as scroll padding
                it also means three items fit exactly without becoming a carousel */
             padding-inline-end: calc(296 * var(--fluid-unit));
