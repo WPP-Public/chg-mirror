@@ -31,7 +31,8 @@
       "offers-carousel",
       "text-with-cta",
       "hero-video",
-      "rte"
+      "rte",
+      "choose-space"
     ]
   },
   {
@@ -124,6 +125,12 @@
     "id": "cards",
     "components": [
       "card"
+    ]
+  },
+  {
+    "id": "choose-space",
+    "components": [
+      "space-option"
     ]
   },
   {
