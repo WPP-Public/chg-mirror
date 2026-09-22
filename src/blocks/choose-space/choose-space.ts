@@ -12,6 +12,8 @@ import { moveInstrumentation } from '@/app/scripts.js';
  */
 const BLOCK_ROWS = { anchorId: 0, title: 1, exploreCta: 2 } as const;
 const ITEM_START = 3;
+// the `space-option` model id; the editor stamps it on every item row
+const ITEM_MODEL = 'space-option';
 const ITEM = {
   label: 0,
   thumbnail: 1,
@@ -196,7 +198,10 @@ function buildSpace(row: Element, blockId: string, index: number): Space | null 
   const cells = [...row.children];
   const label = textOf(cells[ITEM.label]);
   const thumbnail = cells[ITEM.thumbnail]?.querySelector('picture');
-  if (!label && !thumbnail) return null;
+  // a space just added in the editor has no content yet, but dropping it would
+  // leave the author nothing to select and make the add look like it failed
+  const authoring = (row as HTMLElement).dataset.aueModel === ITEM_MODEL;
+  if (!label && !thumbnail && !authoring) return null;
 
   const panelId = `${blockId}-panel-${index}`;
   const tabId = `${blockId}-tab-${index}`;
@@ -270,6 +275,12 @@ function buildSpace(row: Element, blockId: string, index: number): Space | null 
     const caption = document.createElement('span');
     caption.className = 'choose-space-tab-label';
     caption.textContent = label;
+    tab.append(caption);
+  } else if (authoring) {
+    // an unlabelled tab would collapse to nothing and leave the new space unclickable
+    const caption = document.createElement('span');
+    caption.className = 'choose-space-tab-label';
+    caption.textContent = `Space ${index + 1}`;
     tab.append(caption);
   } else {
     tab.setAttribute('aria-label', `Space ${index + 1}`);
@@ -372,8 +383,12 @@ export default function decorate(block: HTMLElement): void {
   const anchorId = textOf(rows[BLOCK_ROWS.anchorId]?.firstElementChild).replace(/^#/, '');
   if (anchorId) block.id = anchorId;
 
-  const spaces = rows
-    .slice(ITEM_START)
+  // in the editor the item rows are the ones carrying the item model; outside it
+  // they are everything after the block-level fields
+  const instrumented = rows.filter((row) => (row as HTMLElement).dataset.aueModel === ITEM_MODEL);
+  const itemRows = instrumented.length ? instrumented : rows.slice(ITEM_START);
+
+  const spaces = itemRows
     .map((row, index) => buildSpace(row, blockId, index))
     .filter((space): space is Space => space !== null);
 
