@@ -100,10 +100,9 @@
 
 .hero-video-prefix {
     position: absolute;
-    left: 50%;
+    right: 0;
     bottom: 100%;
     margin-bottom: 0.5rem;
-    transform: translate(-50%, 0);
 }
 
 .hero-video-prefix,
