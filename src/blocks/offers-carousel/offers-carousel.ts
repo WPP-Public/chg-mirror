@@ -150,10 +150,24 @@ function decorateCard(row: HTMLElement): void {
   mediaCell.append(contentCell);
 }
 
-function applyStackState(cards: HTMLElement[], activeIndex: number): void {
+// mirrors the .is-leaving transition duration in the stylesheet
+const LEAVE_MS = 220;
+
+// gesture tuning: drag distance that counts as a swipe, wheel distance that counts as one step,
+// the idle gap that ends a wheel gesture, and how long a swipe keeps the trailing click quiet
+const SWIPE_THRESHOLD = 40;
+const WHEEL_THRESHOLD = 90;
+const WHEEL_IDLE_MS = 200;
+const CLICK_SWALLOW_MS = 300;
+
+// `skip` keeps the card that is currently swiping out on its own state, so the rest of the
+// stack can already step forward while it drops away
+function applyStackState(cards: HTMLElement[], activeIndex: number, skip?: HTMLElement): void {
   const total = cards.length;
 
   cards.forEach((card, index) => {
+    if (card === skip) return;
+
     const rank = (index - activeIndex + total) % total;
 
     card.classList.remove('is-active', 'is-next-1', 'is-next-2', 'is-hidden');
@@ -165,53 +179,141 @@ function applyStackState(cards: HTMLElement[], activeIndex: number): void {
   });
 }
 
+// places a card in its new slot without animating, then releases it so it rises and fades in
+function playEntry(card: HTMLElement, place: () => void): void {
+  card.classList.add('is-entering');
+  place();
+  // read back the layout so the new slot is committed before the entry transition starts
+  void card.offsetHeight;
+  requestAnimationFrame(() => card.classList.remove('is-entering'));
+}
+
 function wireInteraction(root: HTMLElement, cards: HTMLElement[]): void {
   // the first authored card leads the stack; Figma lists it last only because of paint order
   let activeIndex = 0;
+  let swiping = false;
 
   const prevBtn = root.querySelector('.offers-carousel-nav-prev');
   const nextBtn = root.querySelector('.offers-carousel-nav-next');
-  const stage = root.querySelector('.offers-carousel-stage');
+  const stack = root.querySelector<HTMLElement>('.offers-carousel-cards');
 
   const update = () => applyStackState(cards, activeIndex);
 
+  // reel swipe: the front card slides down out of view, the cards behind push forward, and the
+  // card that left reappears at the rear of the stack
   const goNext = () => {
+    if (swiping || cards.length < 2) return;
+    swiping = true;
+
+    const leaving = cards[activeIndex]!;
+    leaving.classList.add('is-leaving');
     activeIndex = (activeIndex + 1) % cards.length;
-    update();
+    applyStackState(cards, activeIndex, leaving);
+
+    window.setTimeout(() => {
+      leaving.classList.remove('is-leaving');
+      playEntry(leaving, update);
+      swiping = false;
+    }, LEAVE_MS);
   };
 
+  // the reverse: the rear card comes up into the front slot while the others step back
   const goPrev = () => {
+    if (swiping || cards.length < 2) return;
     activeIndex = (activeIndex - 1 + cards.length) % cards.length;
-    update();
+    playEntry(cards[activeIndex]!, update);
   };
 
   prevBtn?.addEventListener('click', goPrev);
   nextBtn?.addEventListener('click', goNext);
 
+  // a swipe that ends on a card is followed by a click, which would advance the stack twice
+  let swallowClick = false;
+
   cards.forEach((card, index) => {
     card.addEventListener('focusin', () => {
+      if (swiping) return;
       activeIndex = index;
       update();
     });
     card.addEventListener('click', (event) => {
+      if (swallowClick) return;
       if ((event.target as Element)?.closest('a')) return;
-      activeIndex = index;
-      update();
-      card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      goNext();
     });
   });
 
-  let startX = 0;
-  stage?.addEventListener('pointerdown', (event) => {
-    startX = (event as PointerEvent).clientX;
+  // both gestures are bound to the stack itself, so a wheel or drag anywhere else in the
+  // section is left to the page
+  let start: { x: number; y: number } | null = null;
+
+  stack?.addEventListener('pointerdown', (event) => {
+    event.stopPropagation();
+    start = { x: event.clientX, y: event.clientY };
   });
 
-  stage?.addEventListener('pointerup', (event) => {
-    const delta = (event as PointerEvent).clientX - startX;
-    if (Math.abs(delta) < 40) return;
-    if (delta < 0) goNext();
+  // the gesture ends on the window so a drag that leaves the stack still counts; pointer
+  // capture is avoided because it would retarget the trailing click away from the card
+  window.addEventListener('pointercancel', () => {
+    start = null;
+  });
+
+  window.addEventListener('pointerup', (event) => {
+    if (!start) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    start = null;
+
+    const vertical = Math.abs(dy) > Math.abs(dx);
+    const delta = vertical ? dy : dx;
+    if (Math.abs(delta) < SWIPE_THRESHOLD) return;
+
+    // the gesture belongs to the stack, nothing outside it should react to the release
+    event.stopPropagation();
+    swallowClick = true;
+    window.setTimeout(() => {
+      swallowClick = false;
+    }, CLICK_SWALLOW_MS);
+
+    // dragging down sends the front card away with the finger; sideways, left is the usual next
+    if (vertical ? delta > 0 : delta < 0) goNext();
     else goPrev();
   });
+
+  let wheelDelta = 0;
+  let wheelLocked = false;
+  let wheelIdle = 0;
+
+  // non-passive: a wheel over the stack drives the reel instead of scrolling the page
+  stack?.addEventListener(
+    'wheel',
+    (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // one step per gesture: the rest of the burst, trackpad momentum included, is swallowed
+      // until the wheel has been idle again
+      window.clearTimeout(wheelIdle);
+      wheelIdle = window.setTimeout(() => {
+        wheelLocked = false;
+        wheelDelta = 0;
+      }, WHEEL_IDLE_MS);
+      if (wheelLocked) return;
+
+      const delta = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      // a change of direction starts a fresh gesture
+      if (Math.sign(delta) !== Math.sign(wheelDelta)) wheelDelta = 0;
+      wheelDelta += delta;
+
+      if (Math.abs(wheelDelta) < WHEEL_THRESHOLD) return;
+      wheelDelta = 0;
+      wheelLocked = true;
+      // matches the macOS wheel direction: pushing the content up pulls the next card forward
+      if (delta < 0) goNext();
+      else goPrev();
+    },
+    { passive: false },
+  );
 
   update();
 }
