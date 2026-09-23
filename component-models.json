@@ -1819,24 +1819,6 @@
         "value": "image-right"
       },
       {
-        "component": "select",
-        "name": "variation",
-        "label": "Variation",
-        "valueType": "string",
-        "multi": false,
-        "options": [
-          {
-            "name": "Little Stars",
-            "value": "little-stars"
-          },
-          {
-            "name": "Gift Card",
-            "value": "gift-card"
-          }
-        ],
-        "value": "little-stars"
-      },
-      {
         "component": "text",
         "name": "eyebrow",
         "label": "Eyebrow Text",
@@ -1855,6 +1837,43 @@
         "label": "Description",
         "valueType": "string",
         "required": true
+      },
+      {
+        "component": "text",
+        "name": "cta",
+        "label": "CTA Text",
+        "valueType": "string"
+      },
+      {
+        "component": "aem-content",
+        "name": "cta_link",
+        "label": "CTA Link",
+        "valueType": "string"
+      },
+      {
+        "component": "boolean",
+        "name": "cta_openInNewTab",
+        "label": "CTA Open in new tab",
+        "valueType": "boolean",
+        "value": false
+      },
+      {
+        "component": "select",
+        "name": "variation",
+        "label": "Variation",
+        "valueType": "string",
+        "multi": false,
+        "options": [
+          {
+            "name": "Little Stars",
+            "value": "little-stars"
+          },
+          {
+            "name": "Gift Card",
+            "value": "gift-card"
+          }
+        ],
+        "value": "little-stars"
       },
       {
         "component": "reference",
@@ -1949,7 +1968,6 @@
         "name": "image2",
         "label": "Gift Card Image 2",
         "valueType": "string",
-        "required": true,
         "condition": {
           "===": [
             {
@@ -1964,7 +1982,6 @@
         "name": "image2Alt",
         "label": "Gift Card Image 2 Alt Text",
         "valueType": "string",
-        "required": true,
         "condition": {
           "===": [
             {
@@ -1979,7 +1996,6 @@
         "name": "image3",
         "label": "Gift Card Image 3",
         "valueType": "string",
-        "required": true,
         "condition": {
           "===": [
             {
@@ -1994,7 +2010,6 @@
         "name": "image3Alt",
         "label": "Gift Card Image 3 Alt Text",
         "valueType": "string",
-        "required": true,
         "condition": {
           "===": [
             {
@@ -2003,25 +2018,6 @@
             "gift-card"
           ]
         }
-      },
-      {
-        "component": "text",
-        "name": "cta",
-        "label": "CTA Text",
-        "valueType": "string"
-      },
-      {
-        "component": "aem-content",
-        "name": "cta_link",
-        "label": "CTA Link",
-        "valueType": "string"
-      },
-      {
-        "component": "boolean",
-        "name": "cta_openInNewTab",
-        "label": "CTA Open in new tab",
-        "valueType": "boolean",
-        "value": false
       },
       {
         "component": "text",
