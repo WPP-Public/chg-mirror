@@ -193,15 +193,10 @@
     "id": "footer",
     "components": [
       "footer-contact",
+      "footer-social-link",
       "newsletter-form",
       "footer-links",
       "footer-bottom"
-    ]
-  },
-  {
-    "id": "footer-contact",
-    "components": [
-      "footer-social-link"
     ]
   },
   {
