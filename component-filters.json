@@ -38,30 +38,14 @@
     ]
   },
   {
-    "id": "rte",
+    "id": "text",
     "rte": {
       "toolbar": {
         "format": [
           "bold",
           "italic",
           "underline",
-          "strike",
-          "code_inline",
-          "text_color"
-        ],
-        "alignment": [
-          "left",
-          "center",
-          "right",
-          "justify"
-        ],
-        "direction": [
-          "rtl",
-          "ltr"
-        ],
-        "indentation": [
-          "indent",
-          "outdent"
+          "strike"
         ],
         "blocks": [
           "paragraph",
@@ -71,8 +55,7 @@
           "h4",
           "h5",
           "h6",
-          "code_block",
-          "blockquote"
+          "code_block"
         ],
         "list": [
           "bullet_list",
@@ -80,10 +63,7 @@
         ],
         "insert": [
           "link",
-          "unlink",
-          "image",
-          "table",
-          "special_characters"
+          "unlink"
         ],
         "sr_script": [
           "superscript",
@@ -91,19 +71,13 @@
         ],
         "editor": [
           "removeformat",
-          "clean_unsupported_tags",
-          "paste_text",
-          "fullscreen",
-          "find_and_replace"
+          "paste_text"
         ],
         "advanced": [
           "classes"
         ],
         "sections": [
           "format",
-          "alignment",
-          "direction",
-          "indentation",
           "blocks",
           "list",
           "insert",
@@ -128,7 +102,7 @@
       }
     },
     "components": [
-      "rte"
+      "text"
     ]
   },
   {
