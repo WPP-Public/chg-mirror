@@ -33,12 +33,7 @@
       "hero-video",
       "hero-destination",
       "rte",
-      "choose-space"
-    ]
-  },
-  {
-    "id": "footer-page",
-    "components": [
+      "choose-space",
       "footer"
     ]
   },

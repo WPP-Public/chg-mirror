@@ -87,12 +87,9 @@
         "hero-video",
         "hero-destination",
         "rte",
-        "choose-space"
+        "choose-space",
+        "footer"
       ]
-    },
-    {
-      "id": "footer-page",
-      "components": ["footer"]
     },
     {
       "id": "richtext",
