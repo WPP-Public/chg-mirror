@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import { versionBannerPlugin, getPackageVersion, manualChunks } from './vite.helpers.ts';
 import { ROOT, SRC_DIR } from './config.ts';
@@ -13,7 +14,7 @@ const aemEntry = path.resolve(SRC_DIR, 'app', 'aem.ts');
 export default defineConfig({
   resolve: {
     alias: {
-      '@': new URL('./src', import.meta.url).pathname,
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   build: {

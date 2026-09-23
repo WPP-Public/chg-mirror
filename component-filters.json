@@ -37,6 +37,12 @@
     ]
   },
   {
+    "id": "footer-page",
+    "components": [
+      "footer"
+    ]
+  },
+  {
     "id": "richtext",
     "rte": {
       "toolbar": {
@@ -78,7 +84,10 @@
           "ordered_list"
         ],
         "insert": [
-          "link",
+          {
+            "name": "link",
+            "hideTarget": false
+          },
           "unlink",
           "image",
           "table",
