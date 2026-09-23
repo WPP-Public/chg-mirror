@@ -92,7 +92,7 @@
       ]
     },
     {
-      "id": "richtext",
+      "id": "text",
       "rte": {
         "toolbar": {
           "format": ["bold", "italic", "underline", "strike", "code_inline", "text_color"],
@@ -119,7 +119,7 @@
           ]
         }
       },
-      "components": ["richtext"]
+      "components": ["text"]
     }
   ]
 }
