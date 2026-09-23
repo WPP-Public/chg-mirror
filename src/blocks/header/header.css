@@ -19,11 +19,7 @@ header:has(.header-menu-panel.is-open) {
     background: var(--site-header-surface);
 }
 
-/* A full-bleed hero-banner as the first section should fill the viewport with the
-   header floating transparently on top of it instead of pushing it down. Absolute
-   (not sticky/fixed) removes the header from flow so the hero can start at the very
-   top, while the header still scrolls away with the page like any other content. */
-body:has(main > div:first-child .hero-banner) header {
+header {
     position: absolute;
     top: 0;
     left: 0;
@@ -54,8 +50,12 @@ body:has(main > div:first-child .hero-banner) header {
 
 .header-menu-toggle {
     justify-self: start;
-    width: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: auto;
     height: 32px;
+    color: #fff;
 }
 
 .header-menu-icon,
@@ -100,6 +100,22 @@ body:has(main > div:first-child .hero-banner) header {
     transform: translateY(0) rotate(-45deg);
 }
 
+.header-menu-toggle[aria-expanded='true'] {
+    color: #1b364b;
+}
+
+.header-menu-toggle-label {
+    display: none;
+    font-family: var(--type-font-family-cta, sans-serif);
+    font-size: var(--typography-fontsize-body-s, 14px);
+    line-height: var(--typography-line-height-body-sm, 16px);
+    text-transform: uppercase;
+}
+
+.header-menu-toggle[aria-expanded='true'] .header-menu-toggle-label {
+    display: inline;
+}
+
 .header-logo {
     grid-column: 2;
     justify-self: center;
@@ -122,16 +138,17 @@ body:has(main > div:first-child .hero-banner) header {
 
 /* Optional dark/active logo variant (second Image authored in /nav), shown instead
    of the default logo while the menu panel is open. Falls back to the single
-   default logo when no variant is authored — see buildLogo in header.ts. */
-.header-logo-img-active {
+   default logo when no variant is authored — see buildLogo in header.ts.
+   Selectors match ".header-logo img" specificity so they aren't overridden by it. */
+.header-logo img.header-logo-img-active {
     display: none;
 }
 
-header:has(.header-menu-panel.is-open) .header-logo-img-default {
+header:has(.header-menu-panel.is-open) .header-logo img.header-logo-img-default {
     display: none;
 }
 
-header:has(.header-menu-panel.is-open) .header-logo-img-active {
+header:has(.header-menu-panel.is-open) .header-logo img.header-logo-img-active {
     display: block;
 }
 
@@ -152,7 +169,7 @@ header:has(.header-menu-panel.is-open) .header-logo-img-active {
     display: flex;
     align-items: start;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 32px;
 }
 
 .header-inner > .header-tools .header-lang {
@@ -167,19 +184,40 @@ header:has(.header-menu-panel.is-open) .header-logo-img-active {
 .header-lang-trigger {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 4px;
     height: var(--component-button-height, 40px);
-    border-bottom: 1px solid currentcolor;
-    font-family: var(--type-font-family-body, sans-serif);
-    font-size: var(--typography-fontsize-body-s, 14px);
-    line-height: var(--typography-line-height-body-sm, 16px);
+    width: 53px;
+    color: var(--color-text-action-inverse-default, #fff);
+    font-family: var(--type-font-family-cta, sans-serif);
+    font-size: 16px;
+    font-weight: var(--type-font-weight-text-link, 300);
+    line-height: 16px;
     text-transform: uppercase;
 }
 
-.header-lang-trigger::after {
+header:has(.header-menu-panel.is-open) .header-lang-trigger {
+    color: var(--site-header-text);
+}
+
+.header-lang-label {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.header-lang-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+}
+
+.header-lang-icon::after {
     content: '';
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border: solid currentcolor;
     border-width: 0 1px 1px 0;
     transform: rotate(45deg) translateY(-2px);
@@ -236,12 +274,14 @@ header .header-cta {
     justify-content: center;
     min-width: 72px;
     height: var(--component-button-height, 40px);
-    padding: 0 16px;
+    padding: var(--component-button-padding-block, 4px) var(--component-button-padding-inline, 24px);
     color: var(--color-text-on-action-inverse-default, #1b364b);
     background: var(--color-surface-action-inverse-default, #fff);
+    border-radius: var(--component-button-corner-standard, 2px);
     font-family: var(--type-font-family-cta, sans-serif);
-    font-size: var(--typography-fontsize-body-s, 14px);
-    line-height: var(--typography-line-height-body-sm, 16px);
+    font-size: 16px;
+    font-weight: var(--type-font-weight-button, 300);
+    line-height: 16px;
     text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;

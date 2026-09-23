@@ -22,7 +22,7 @@ function getFragmentBasePath(): string {
 
 /** Rebuilds a single authored link, preserving href/target/rel and full child markup (icons included). */
 function buildLink(srcItem: Element): HTMLAnchorElement | null {
-  const srcA = srcItem.querySelector('a');
+  const srcA = srcItem.matches('a') ? (srcItem as HTMLAnchorElement) : srcItem.querySelector<HTMLAnchorElement>('a');
   if (!srcA) return null;
   const a = document.createElement('a');
   a.href = srcA.href;
@@ -77,7 +77,7 @@ function buildNewsletterGroup(section: Element | undefined): HTMLDivElement | nu
 function buildSocialLink(srcItem: Element): HTMLLIElement {
   const item = document.createElement('li');
   moveInstrumentation(srcItem, item);
-  const srcA = srcItem.querySelector('a');
+  const srcA = srcItem.matches('a') ? (srcItem as HTMLAnchorElement) : srcItem.querySelector<HTMLAnchorElement>('a');
   if (srcA) {
     const a = buildLink(srcItem);
     if (a) {
@@ -96,7 +96,11 @@ function buildContactGroup(section: Element | undefined): HTMLDivElement | null 
   if (!wrapper) return null;
 
   const socialList = wrapper.querySelector(':scope > ul');
-  const contactEls = [...wrapper.children].filter((el) => el !== socialList);
+  const socialParagraph = [...wrapper.children].find(
+    (el) => el.tagName === 'P' && el.querySelector(':scope > a span.icon'),
+  );
+  const socialSource = socialList || socialParagraph;
+  const contactEls = [...wrapper.children].filter((el) => el !== socialSource);
 
   const group = document.createElement('div');
   group.className = 'footer-contact';
@@ -112,7 +116,7 @@ function buildContactGroup(section: Element | undefined): HTMLDivElement | null 
     group.append(contact);
   }
 
-  if (socialList) {
+  if (socialSource) {
     const social = document.createElement('div');
     social.className = 'footer-social';
     const heading = document.createElement('p');
@@ -120,8 +124,9 @@ function buildContactGroup(section: Element | undefined): HTMLDivElement | null 
     heading.textContent = 'Follow Us On';
     const list = document.createElement('ul');
     list.className = 'footer-social-list';
-    moveInstrumentation(socialList, list);
-    [...socialList.children].forEach((srcItem) => list.append(buildSocialLink(srcItem)));
+    moveInstrumentation(socialSource, list);
+    const socialItems = socialList ? [...socialList.children] : [...socialSource.querySelectorAll(':scope > a')];
+    socialItems.forEach((srcItem) => list.append(buildSocialLink(srcItem)));
     social.append(heading, list);
     group.append(social);
   }
@@ -135,23 +140,27 @@ function buildLegalGroup(section: Element | undefined): HTMLDivElement | null {
   if (!wrapper) return null;
 
   const legalList = wrapper.querySelector(':scope > ul');
-  const copyright = [...wrapper.children].find((el) => el.tagName === 'P' && el !== legalList);
-  if (!legalList && !copyright) return null;
+  const legalParagraph = [...wrapper.children].find((el) => el.tagName === 'P' && el.querySelector(':scope > a'));
+  const copyright = [...wrapper.children].find((el) => el.tagName === 'P' && el !== legalParagraph);
+  if (!legalList && !legalParagraph && !copyright) return null;
 
   const group = document.createElement('div');
   group.className = 'footer-legal';
   moveInstrumentation(wrapper, group);
 
-  if (legalList) {
+  const legalSource = legalList || legalParagraph;
+  if (legalSource) {
     const list = document.createElement('ul');
     list.className = 'footer-legal-list';
-    moveInstrumentation(legalList, list);
-    [...legalList.children].forEach((srcItem) => {
+    moveInstrumentation(legalSource, list);
+    const legalItems = legalList ? [...legalList.children] : [...legalSource.querySelectorAll(':scope > a')];
+    legalItems.forEach((srcItem) => {
       const item = document.createElement('li');
       moveInstrumentation(srcItem, item);
       const a = buildLink(srcItem);
       if (a) {
-        a.textContent = srcItem.querySelector('a')?.textContent?.trim() ?? '';
+        const sourceLink = srcItem.matches('a') ? srcItem : srcItem.querySelector('a');
+        a.textContent = sourceLink?.textContent?.trim() ?? '';
         item.append(a);
       } else {
         item.textContent = srcItem.textContent?.trim() ?? '';
