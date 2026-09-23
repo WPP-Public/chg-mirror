@@ -839,23 +839,9 @@
     "id": "footer-contact",
     "fields": [
       {
-        "component": "text",
-        "name": "reservationEmail",
-        "label": "Reservation Email",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "textarea",
-        "name": "phoneNumbers",
-        "label": "Phone Numbers",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "textarea",
-        "name": "physicalAddress",
-        "label": "Physical Address",
+        "component": "richtext",
+        "name": "contactContent",
+        "label": "Contact Information",
         "valueType": "string",
         "required": true
       }
@@ -865,39 +851,12 @@
     "id": "footer-social-link",
     "fields": [
       {
-        "component": "select",
-        "name": "platform",
-        "label": "Social Platform",
-        "valueType": "string",
-        "required": true,
-        "options": [
-          {
-            "name": "Facebook",
-            "value": "facebook"
-          },
-          {
-            "name": "Instagram",
-            "value": "instagram"
-          },
-          {
-            "name": "Line",
-            "value": "line"
-          }
-        ]
-      },
-      {
         "component": "reference",
         "name": "icon",
         "label": "Social Media Icon",
         "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "text",
-        "name": "iconAlt",
-        "label": "Icon Alt Text",
-        "valueType": "string",
-        "required": true
+        "required": true,
+        "multi": false
       },
       {
         "component": "aem-content",
@@ -923,6 +882,16 @@
         "name": "title",
         "label": "Link Group Title",
         "valueType": "string"
+      },
+      {
+        "component": "number",
+        "name": "itemsPerColumn",
+        "label": "Items Before Second Column",
+        "description": "Number of brand navigation links to show in the first column before continuing in the second column.",
+        "valueType": "number",
+        "value": 5,
+        "numberMin": 1,
+        "numberMax": 8
       }
     ]
   },
