@@ -78,7 +78,10 @@
           "ordered_list"
         ],
         "insert": [
-          "link",
+          {
+            "name": "link",
+            "hideTarget": false
+          },
           "unlink",
           "image",
           "table",

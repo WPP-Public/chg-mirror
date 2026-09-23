@@ -84,22 +84,33 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+    /* the stack consumes the gesture itself, in both axes */
+    touch-action: none;
 }
 
+/* every stack offset is expressed through --card-x/--card-y so the swipe can add its own
+   --card-shift on top without having to know the current breakpoint's geometry */
 .offers-carousel .offers-carousel-card {
+    --card-x: -50%;
+    --card-y: 0px;
+    --card-shift: 0px;
+    --card-move-duration: 0.32s;
+    --card-move-easing: cubic-bezier(0.22, 0.61, 0.36, 1);
+
     position: absolute;
     top: 0;
     left: 50%;
     width: 260px;
     height: 300px;
     cursor: pointer;
+    transform: translate(var(--card-x), calc(var(--card-y) + var(--card-shift)));
     transition:
-        top 0.35s ease,
-        right 0.35s ease,
-        width 0.35s ease,
-        height 0.35s ease,
-        opacity 0.35s ease,
-        transform 0.35s ease;
+        top var(--card-move-duration) var(--card-move-easing),
+        right var(--card-move-duration) var(--card-move-easing),
+        width var(--card-move-duration) var(--card-move-easing),
+        height var(--card-move-duration) var(--card-move-easing),
+        opacity var(--card-move-duration) var(--card-move-easing),
+        transform var(--card-move-duration) var(--card-move-easing);
 }
 
 .offers-carousel .offers-carousel-card-media {
@@ -245,7 +256,6 @@
     height: 328px;
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(-50%);
 }
 
 .offers-carousel .offers-carousel-card.is-next-1 {
@@ -255,7 +265,6 @@
     height: 335px;
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(-50%);
 }
 
 .offers-carousel .offers-carousel-card.is-next-2 {
@@ -265,12 +274,33 @@
     height: 300px;
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(-50%);
 }
 
 .offers-carousel .offers-carousel-card.is-hidden {
     opacity: 0;
     pointer-events: none;
+}
+
+/* Reel swipe, part one: the front card drops out of the stack and fades away fast while the
+   cards behind it are already stepping forward. Duration is mirrored by LEAVE_MS in the block. */
+.offers-carousel .offers-carousel-card.is-leaving {
+    --card-shift: 120px;
+
+    z-index: 5;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 0.22s ease-in,
+        transform 0.22s cubic-bezier(0.55, 0, 1, 0.45);
+}
+
+/* Part two: the card takes the rear slot with transitions off, then the block drops this class
+   so it rises into place and fades back in. */
+.offers-carousel .offers-carousel-card.is-entering {
+    --card-shift: 56px;
+
+    opacity: 0;
+    transition: none;
 }
 
 @media (width >= 768px) {
@@ -287,9 +317,10 @@
     }
 
     .offers-carousel .offers-carousel-card {
+        --card-x: 0px;
+
         left: auto;
         right: 0;
-        transform: none;
     }
 
     /* the stack is right-anchored and steps 20px narrower behind the active card */
@@ -298,7 +329,6 @@
         right: 0;
         width: min(360px, 100%);
         height: 432px;
-        transform: none;
     }
 
     .offers-carousel .offers-carousel-card.is-next-1 {
@@ -306,7 +336,6 @@
         right: 20px;
         width: min(320px, calc(100% - 20px));
         height: 384px;
-        transform: none;
     }
 
     .offers-carousel .offers-carousel-card.is-next-2 {
@@ -314,7 +343,6 @@
         right: 40px;
         width: min(280px, calc(100% - 40px));
         height: 336px;
-        transform: none;
     }
 
     .offers-carousel .offers-carousel-card-ctas {
@@ -360,20 +388,31 @@
 
     /* offsets live on transform so switching state animates instead of jumping */
     .offers-carousel .offers-carousel-card.is-active {
-        transform: translate(0, calc((var(--card-count) - 1) * var(--card-step)));
+        --card-y: calc((var(--card-count) - 1) * var(--card-step));
     }
 
     .offers-carousel .offers-carousel-card.is-next-1 {
-        transform: translate(52px, calc((var(--card-count) - 2) * var(--card-step)));
+        --card-x: 52px;
+        --card-y: calc((var(--card-count) - 2) * var(--card-step));
     }
 
     .offers-carousel .offers-carousel-card.is-next-2 {
-        transform: translate(104px, 0);
+        --card-x: 104px;
     }
 
     .offers-carousel .offers-carousel-card-body {
         justify-content: flex-start;
         max-width: 400px;
         text-align: left;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .offers-carousel .offers-carousel-card,
+    .offers-carousel .offers-carousel-card.is-leaving,
+    .offers-carousel .offers-carousel-card.is-entering {
+        --card-shift: 0px;
+
+        transition-duration: 0.01ms;
     }
 }

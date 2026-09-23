@@ -15,6 +15,9 @@ const OPTIONS_GRAPHQL_QUERY = '/graphql/execute.json/capella-hotels/ListCF';
 // dynamically decorated block.
 const HCAPTCHA_API_SRC = 'https://js.hcaptcha.com/1/api.js?render=explicit';
 
+// Temporarily disabled while performance scoring is evaluated.
+const HCAPTCHA_ENABLED = false;
+
 // Visitor-entered fields that are all mandatory. Submission is rejected (and
 // never sent) if any of these is missing or blank.
 const REQUIRED_FIELDS = ['salutation', 'firstName', 'lastName', 'email', 'country'];
@@ -274,6 +277,7 @@ function resolveFallbackCode(): string {
  * `hcaptcha-site-key` <meta> tag when no environment key is configured.
  */
 function getHCaptchaSiteKey(): string {
+  if (!HCAPTCHA_ENABLED) return '';
   return (
     getEnvHCaptchaSiteKey() ||
     document.head.querySelector<HTMLMetaElement>('meta[name="hcaptcha-site-key"]')?.content?.trim() ||

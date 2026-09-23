@@ -205,7 +205,16 @@ function buildLangZone(languages: NavLanguage[], activeLabel: string): HTMLDivEl
   trigger.dataset.testid = 'header-lang-trigger';
   trigger.setAttribute('aria-expanded', 'false');
   trigger.setAttribute('aria-haspopup', 'listbox');
-  trigger.textContent = activeLabel;
+
+  const label = document.createElement('span');
+  label.className = 'header-lang-label';
+  label.textContent = activeLabel;
+  trigger.append(label);
+
+  const icon = document.createElement('span');
+  icon.className = 'header-lang-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  trigger.append(icon);
 
   const dropdown = document.createElement('ul');
   dropdown.className = 'header-lang-dropdown';
@@ -224,7 +233,7 @@ function buildLangZone(languages: NavLanguage[], activeLabel: string): HTMLDivEl
     item.append(anchor);
 
     item.addEventListener('click', () => {
-      trigger.textContent = lang.shortLabel;
+      label.textContent = lang.shortLabel;
       dropdown.querySelectorAll('li').forEach((li) => li.removeAttribute('aria-selected'));
       item.setAttribute('aria-selected', 'true');
       closeLangDropdown(trigger, dropdown);
@@ -311,7 +320,7 @@ function buildCtaZone(label: string, href: string): HTMLAnchorElement | null {
   return cta;
 }
 
-function buildMenuToggle(): HTMLButtonElement {
+function buildMenuToggle(closeLabel: string): HTMLButtonElement {
   const button = document.createElement('button');
   button.className = 'header-menu-toggle';
   button.type = 'button';
@@ -322,7 +331,13 @@ function buildMenuToggle(): HTMLButtonElement {
   const icon = document.createElement('span');
   icon.className = 'header-menu-icon';
   icon.setAttribute('aria-hidden', 'true');
-  button.append(icon);
+
+  const label = document.createElement('span');
+  label.className = 'header-menu-toggle-label';
+  label.textContent = closeLabel;
+  label.setAttribute('aria-hidden', 'true');
+
+  button.append(icon, label);
   return button;
 }
 
@@ -562,7 +577,9 @@ export default async function decorate(block: HTMLElement): Promise<void> {
   }
 
   const [logoImg, logoImgDark] = chromeSection.querySelectorAll('picture img');
-  const ctaAnchor = chromeSection.querySelector<HTMLAnchorElement>('.default-content-wrapper > p > a');
+  const chromeLinks = [...chromeSection.querySelectorAll<HTMLAnchorElement>('.default-content-wrapper > p > a')];
+  const ctaAnchor = chromeLinks[0];
+  const closeMenuLabel = chromeLinks[1]?.textContent?.trim() || 'CLOSE';
   const activeLang = getActiveLang(languages);
 
   const logo = buildLogo(
@@ -572,7 +589,7 @@ export default async function decorate(block: HTMLElement): Promise<void> {
     logoImgDark?.getAttribute('alt') ?? '',
     activeLang.href,
   );
-  const menuToggle = buildMenuToggle();
+  const menuToggle = buildMenuToggle(closeMenuLabel);
   const langZone = buildLangZone(languages, activeLang.shortLabel);
   const cta = buildCtaZone(ctaAnchor?.textContent?.trim() ?? '', ctaAnchor?.getAttribute('href') ?? '');
   const { panel, activateInitial } = buildMenuPanel(categories, languages, activeLang.shortLabel);
