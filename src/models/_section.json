@@ -92,7 +92,7 @@
       ]
     },
     {
-      "id": "text",
+      "id": "rte",
       "rte": {
         "toolbar": {
           "format": ["bold", "italic", "underline", "strike", "code_inline", "text_color"],
