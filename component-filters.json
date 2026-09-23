@@ -128,7 +128,9 @@
       }
     },
     "components": [
-      "text"
+      "text",
+      "awards-list",
+      "rte"
     ]
   },
   {
