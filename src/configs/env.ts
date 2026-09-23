@@ -39,7 +39,7 @@ export const ENV_CONFIG: EnvConfigEntry[] = [
   },
   {
     env: 'stage',
-    publishUrl: 'https://publish-p35060-e2270128.adobeaemcloud.com/',
+    publishUrl: 'https://publish-p35060-e2270128.adobeaemcloud.com',
     hostnames: [
       'author-p35060-e2270128.adobeaemcloud.com',
       'main--capella-hotels--wpp-public.aem.page',
