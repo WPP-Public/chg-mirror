@@ -4,18 +4,6 @@ import { decorateRichtext } from './editor-support-rte';
 
 let promiseChanges$: Promise<boolean> = Promise.resolve(false);
 
-function isFooterPage(): boolean {
-  const segments = window.location.pathname.split('/').filter(Boolean);
-  return segments.at(-1)?.toLowerCase() === 'footer';
-}
-
-function applyPageFilter(main: Element | null): void {
-  if (!main || !isFooterPage()) return;
-  main.querySelectorAll<HTMLElement>(':scope > .section').forEach((section) => {
-    section.dataset.aueFilter = 'footer-page';
-  });
-}
-
 async function applyChanges(event: Event): Promise<boolean> {
   await promiseChanges$;
 
@@ -46,7 +34,6 @@ async function applyChanges(event: Event): Promise<boolean> {
       decorateMain(newMain);
       decorateRichtext(newMain);
       await loadSections(newMain);
-      applyPageFilter(newMain);
       element.remove();
       newMain.style.display = '';
 
@@ -89,7 +76,6 @@ async function applyChanges(event: Event): Promise<boolean> {
           decorateSections(parentElement);
           decorateBlocks(parentElement);
           await loadSections(parentElement);
-          applyPageFilter(parentElement);
           element.remove();
           newSection.style.display = '';
         } else if (parentElement) {
@@ -127,7 +113,6 @@ function attachEventListeners(main: HTMLElement | null): void {
 }
 
 attachEventListeners(document.querySelector('main'));
-applyPageFilter(document.querySelector('main'));
 
 // decorate rich text
 // this has to happen after decorateMain(), and everythime decorateBlocks() is called
