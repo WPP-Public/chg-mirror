@@ -9,11 +9,9 @@ function isFooterPage(): boolean {
   return segments.at(-1)?.toLowerCase() === 'footer';
 }
 
-function applyPageFilter(main: Element | null): void {
-  if (!main || !isFooterPage()) return;
-  main.querySelectorAll<HTMLElement>(':scope > .section').forEach((section) => {
-    section.dataset.aueFilter = 'footer-page';
-  });
+function applyPageFilter(main: HTMLElement | null): void {
+  if (!main) return;
+  main.dataset.aueFilter = isFooterPage() ? 'footer-page' : 'section';
 }
 
 async function applyChanges(event: Event): Promise<boolean> {
