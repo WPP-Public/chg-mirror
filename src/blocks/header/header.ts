@@ -205,7 +205,16 @@ function buildLangZone(languages: NavLanguage[], activeLabel: string): HTMLDivEl
   trigger.dataset.testid = 'header-lang-trigger';
   trigger.setAttribute('aria-expanded', 'false');
   trigger.setAttribute('aria-haspopup', 'listbox');
-  trigger.textContent = activeLabel;
+
+  const label = document.createElement('span');
+  label.className = 'header-lang-label';
+  label.textContent = activeLabel;
+  trigger.append(label);
+
+  const icon = document.createElement('span');
+  icon.className = 'header-lang-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  trigger.append(icon);
 
   const dropdown = document.createElement('ul');
   dropdown.className = 'header-lang-dropdown';
@@ -224,7 +233,7 @@ function buildLangZone(languages: NavLanguage[], activeLabel: string): HTMLDivEl
     item.append(anchor);
 
     item.addEventListener('click', () => {
-      trigger.textContent = lang.shortLabel;
+      label.textContent = lang.shortLabel;
       dropdown.querySelectorAll('li').forEach((li) => li.removeAttribute('aria-selected'));
       item.setAttribute('aria-selected', 'true');
       closeLangDropdown(trigger, dropdown);

@@ -169,7 +169,7 @@ header:has(.header-menu-panel.is-open) .header-logo img.header-logo-img-active {
     display: flex;
     align-items: start;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 32px;
 }
 
 .header-inner > .header-tools .header-lang {
@@ -184,19 +184,40 @@ header:has(.header-menu-panel.is-open) .header-logo img.header-logo-img-active {
 .header-lang-trigger {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 4px;
     height: var(--component-button-height, 40px);
-    border-bottom: 1px solid currentcolor;
-    font-family: var(--type-font-family-body, sans-serif);
-    font-size: var(--typography-fontsize-body-s, 14px);
-    line-height: var(--typography-line-height-body-sm, 16px);
+    width: 53px;
+    color: var(--color-text-action-inverse-default, #fff);
+    font-family: var(--type-font-family-cta, sans-serif);
+    font-size: 16px;
+    font-weight: var(--type-font-weight-text-link, 300);
+    line-height: 16px;
     text-transform: uppercase;
 }
 
-.header-lang-trigger::after {
+header:has(.header-menu-panel.is-open) .header-lang-trigger {
+    color: var(--site-header-text);
+}
+
+.header-lang-label {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.header-lang-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+}
+
+.header-lang-icon::after {
     content: '';
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border: solid currentcolor;
     border-width: 0 1px 1px 0;
     transform: rotate(45deg) translateY(-2px);
@@ -253,12 +274,14 @@ header .header-cta {
     justify-content: center;
     min-width: 72px;
     height: var(--component-button-height, 40px);
-    padding: 0 16px;
+    padding: var(--component-button-padding-block, 4px) var(--component-button-padding-inline, 24px);
     color: var(--color-text-on-action-inverse-default, #1b364b);
     background: var(--color-surface-action-inverse-default, #fff);
+    border-radius: var(--component-button-corner-standard, 2px);
     font-family: var(--type-font-family-cta, sans-serif);
-    font-size: var(--typography-fontsize-body-s, 14px);
-    line-height: var(--typography-line-height-body-sm, 16px);
+    font-size: 16px;
+    font-weight: var(--type-font-weight-button, 300);
+    line-height: 16px;
     text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;
