@@ -133,7 +133,7 @@
           }
         }
       },
-      "components": ["text", "awards-list", "rte"]
+      "components": ["rte"]
     }
   ]
 }
