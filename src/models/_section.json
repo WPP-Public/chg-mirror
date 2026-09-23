@@ -107,15 +107,6 @@
         "actions": {
           "link": {
             "hideTarget": false
-          },
-          "classes": {
-            "label": "Add Custom Class",
-            "options": [
-              {
-                "value": "open-in-new-tab",
-                "label": "Open in new tab"
-              }
-            ]
           }
         }
       },
