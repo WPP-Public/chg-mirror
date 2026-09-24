@@ -171,6 +171,13 @@ export function decorateButtons(main: Element): void {
       a.classList.add('secondary');
       em.replaceWith(a);
     }
+
+    // authored via the button model's "Open in New Tab" toggle, rendered as a data attribute
+    if (a.dataset.openInNewTab === 'true') {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      delete a.dataset.openInNewTab;
+    }
   });
 }
 
