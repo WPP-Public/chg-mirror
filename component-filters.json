@@ -33,40 +33,19 @@
       "hero-video",
       "hero-destination",
       "rte",
-      "choose-space"
-    ]
-  },
-  {
-    "id": "footer-page",
-    "components": [
+      "choose-space",
       "footer"
     ]
   },
   {
-    "id": "richtext",
+    "id": "text",
     "rte": {
       "toolbar": {
         "format": [
           "bold",
           "italic",
           "underline",
-          "strike",
-          "code_inline",
-          "text_color"
-        ],
-        "alignment": [
-          "left",
-          "center",
-          "right",
-          "justify"
-        ],
-        "direction": [
-          "rtl",
-          "ltr"
-        ],
-        "indentation": [
-          "indent",
-          "outdent"
+          "strike"
         ],
         "blocks": [
           "paragraph",
@@ -76,22 +55,15 @@
           "h4",
           "h5",
           "h6",
-          "code_block",
-          "blockquote"
+          "code_block"
         ],
         "list": [
           "bullet_list",
           "ordered_list"
         ],
         "insert": [
-          {
-            "name": "link",
-            "hideTarget": false
-          },
-          "unlink",
-          "image",
-          "table",
-          "special_characters"
+          "link",
+          "unlink"
         ],
         "sr_script": [
           "superscript",
@@ -99,19 +71,13 @@
         ],
         "editor": [
           "removeformat",
-          "clean_unsupported_tags",
-          "paste_text",
-          "fullscreen",
-          "find_and_replace"
+          "paste_text"
         ],
         "advanced": [
           "classes"
         ],
         "sections": [
           "format",
-          "alignment",
-          "direction",
-          "indentation",
           "blocks",
           "list",
           "insert",
@@ -119,10 +85,15 @@
           "editor",
           "advanced"
         ]
+      },
+      "actions": {
+        "link": {
+          "hideTarget": false
+        }
       }
     },
     "components": [
-      "richtext"
+      "text"
     ]
   },
   {
@@ -198,15 +169,10 @@
     "id": "footer",
     "components": [
       "footer-contact",
+      "footer-social-link",
       "newsletter-form",
       "footer-links",
       "footer-bottom"
-    ]
-  },
-  {
-    "id": "footer-contact",
-    "components": [
-      "footer-social-link"
     ]
   },
   {

@@ -839,23 +839,9 @@
     "id": "footer-contact",
     "fields": [
       {
-        "component": "text",
-        "name": "reservationEmail",
-        "label": "Reservation Email",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "textarea",
-        "name": "phoneNumbers",
-        "label": "Phone Numbers",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "textarea",
-        "name": "physicalAddress",
-        "label": "Physical Address",
+        "component": "richtext",
+        "name": "contactContent",
+        "label": "Contact Information",
         "valueType": "string",
         "required": true
       }
@@ -865,39 +851,12 @@
     "id": "footer-social-link",
     "fields": [
       {
-        "component": "select",
-        "name": "platform",
-        "label": "Social Platform",
-        "valueType": "string",
-        "required": true,
-        "options": [
-          {
-            "name": "Facebook",
-            "value": "facebook"
-          },
-          {
-            "name": "Instagram",
-            "value": "instagram"
-          },
-          {
-            "name": "Line",
-            "value": "line"
-          }
-        ]
-      },
-      {
         "component": "reference",
         "name": "icon",
         "label": "Social Media Icon",
         "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "text",
-        "name": "iconAlt",
-        "label": "Icon Alt Text",
-        "valueType": "string",
-        "required": true
+        "required": true,
+        "multi": false
       },
       {
         "component": "aem-content",
@@ -923,6 +882,16 @@
         "name": "title",
         "label": "Link Group Title",
         "valueType": "string"
+      },
+      {
+        "component": "number",
+        "name": "itemsPerColumn",
+        "label": "Items Before Second Column",
+        "description": "Number of brand navigation links to show in the first column before continuing in the second column.",
+        "valueType": "number",
+        "value": 5,
+        "numberMin": 1,
+        "numberMax": 8
       }
     ]
   },
@@ -1803,7 +1772,7 @@
       {
         "component": "select",
         "name": "classes",
-        "label": "Variation",
+        "label": "Image Position",
         "valueType": "string",
         "multi": false,
         "options": [
@@ -1815,7 +1784,8 @@
             "name": "Image on Left",
             "value": "image-left"
           }
-        ]
+        ],
+        "value": "image-right"
       },
       {
         "component": "text",
@@ -1838,32 +1808,6 @@
         "required": true
       },
       {
-        "component": "reference",
-        "name": "image",
-        "label": "Desktop/Tablet Asset",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "text",
-        "name": "imageAlt",
-        "label": "Desktop/Tablet Asset Alt Text",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "reference",
-        "name": "imageMobile",
-        "label": "Mobile Asset",
-        "valueType": "string"
-      },
-      {
-        "component": "text",
-        "name": "imageMobileAlt",
-        "label": "Mobile Asset Alt Text",
-        "valueType": "string"
-      },
-      {
         "component": "text",
         "name": "cta",
         "label": "CTA Text",
@@ -1881,6 +1825,168 @@
         "label": "CTA Open in new tab",
         "valueType": "boolean",
         "value": false
+      },
+      {
+        "component": "select",
+        "name": "variation",
+        "label": "Variation",
+        "valueType": "string",
+        "multi": false,
+        "options": [
+          {
+            "name": "Little Stars",
+            "value": "little-stars"
+          },
+          {
+            "name": "Gift Card",
+            "value": "gift-card"
+          }
+        ],
+        "value": "little-stars"
+      },
+      {
+        "component": "reference",
+        "name": "image",
+        "label": "Desktop/Tablet Asset",
+        "valueType": "string",
+        "required": true,
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "little-stars"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "imageAlt",
+        "label": "Desktop/Tablet Asset Alt Text",
+        "valueType": "string",
+        "required": true,
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "little-stars"
+          ]
+        }
+      },
+      {
+        "component": "reference",
+        "name": "imageMobile",
+        "label": "Mobile Asset",
+        "valueType": "string",
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "little-stars"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "imageMobileAlt",
+        "label": "Mobile Asset Alt Text",
+        "valueType": "string",
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "little-stars"
+          ]
+        }
+      },
+      {
+        "component": "reference",
+        "name": "image1",
+        "label": "Gift Card Image 1",
+        "valueType": "string",
+        "required": true,
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "gift-card"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "image1Alt",
+        "label": "Gift Card Image 1 Alt Text",
+        "valueType": "string",
+        "required": true,
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "gift-card"
+          ]
+        }
+      },
+      {
+        "component": "reference",
+        "name": "image2",
+        "label": "Gift Card Image 2",
+        "valueType": "string",
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "gift-card"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "image2Alt",
+        "label": "Gift Card Image 2 Alt Text",
+        "valueType": "string",
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "gift-card"
+          ]
+        }
+      },
+      {
+        "component": "reference",
+        "name": "image3",
+        "label": "Gift Card Image 3",
+        "valueType": "string",
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "gift-card"
+          ]
+        }
+      },
+      {
+        "component": "text",
+        "name": "image3Alt",
+        "label": "Gift Card Image 3 Alt Text",
+        "valueType": "string",
+        "condition": {
+          "===": [
+            {
+              "var": "variation"
+            },
+            "gift-card"
+          ]
+        }
       },
       {
         "component": "text",

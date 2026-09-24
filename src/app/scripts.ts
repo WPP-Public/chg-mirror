@@ -191,10 +191,6 @@ function buildAutoBlocks(): void {
  * @param {Element} main The main element
  */
 export function decorateMain(main: Element): void {
-  if (main instanceof HTMLElement) {
-    const segments = window.location.pathname.split('/').filter(Boolean);
-    main.dataset.aueFilter = segments.at(-1)?.toLowerCase() === 'footer' ? 'footer-page' : 'section';
-  }
   decorateIcons(main);
   buildAutoBlocks();
   decorateSections(main);
