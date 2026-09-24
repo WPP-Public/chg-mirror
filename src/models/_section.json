@@ -109,7 +109,7 @@
     },
     {
       "id": "header-section",
-      "components": ["text"]
+      "components": ["text", "image", "button", "hero"]
     },
     {
       "id": "text",
