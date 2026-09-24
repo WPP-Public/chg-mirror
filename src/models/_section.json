@@ -69,6 +69,7 @@
     {
       "id": "richtext",
       "rte": {
+        "plugins": "link",
         "toolbar": {
           "format": ["bold", "italic", "underline", "strike", "code_inline", "text_color"],
           "alignment": ["left", "center", "right", "justify"],
@@ -92,6 +93,11 @@
             "editor",
             "advanced"
           ]
+        },
+        "actions": {
+          "link": {
+            "hideTarget": false
+          }
         }
       },
       "components": ["richtext"]
