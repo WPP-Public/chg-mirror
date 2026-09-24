@@ -13,6 +13,21 @@
           }
         }
       }
+    },
+    {
+      "title": "Header Section",
+      "id": "header-section",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/section/v1/section",
+            "template": {
+              "model": "section",
+              "filter": "header-section"
+            }
+          }
+        }
+      }
     }
   ],
   "models": [
@@ -92,9 +107,12 @@
       ]
     },
     {
+      "id": "header-section",
+      "components": ["text"]
+    },
+    {
       "id": "text",
       "rte": {
-        "plugins": "link",
         "toolbar": {
           "format": ["bold", "italic", "underline", "strike"],
           "blocks": ["paragraph", "h1", "h2", "h3", "h4", "h5", "h6", "code_block"],

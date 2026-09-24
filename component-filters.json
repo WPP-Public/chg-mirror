@@ -38,9 +38,14 @@
     ]
   },
   {
+    "id": "header-section",
+    "components": [
+      "text"
+    ]
+  },
+  {
     "id": "text",
     "rte": {
-      "plugins": "link",
       "toolbar": {
         "format": [
           "bold",
