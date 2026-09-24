@@ -23,7 +23,7 @@
             "resourceType": "core/franklin/components/section/v1/section",
             "template": {
               "name": "Header Section",
-              "model": "section",
+              "model": "header-section",
               "filter": "header-section"
             }
           }
@@ -70,6 +70,54 @@
               "value": "destinations"
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "header-section",
+      "fields": [
+        {
+          "component": "text",
+          "name": "name",
+          "label": "Section Name",
+          "description": "The label shown for this section in the Content Tree"
+        },
+        {
+          "component": "text",
+          "name": "level1NavTitle",
+          "label": "Level 1 Nav Title",
+          "valueType": "string"
+        },
+        {
+          "component": "reference",
+          "name": "image",
+          "label": "Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "name": "imageAlt",
+          "label": "Alt Text",
+          "valueType": "string"
+        },
+        {
+          "component": "text",
+          "name": "ctaLabel",
+          "label": "CTA Label",
+          "valueType": "string"
+        },
+        {
+          "component": "aem-content",
+          "name": "ctaLink",
+          "label": "CTA Link",
+          "valueType": "string"
+        },
+        {
+          "component": "boolean",
+          "name": "openInNewTab",
+          "label": "Open in New Tab",
+          "valueType": "boolean",
+          "value": false
         }
       ]
     }
