@@ -157,7 +157,7 @@
     },
     {
       "id": "header-section",
-      "components": ["text", "image", "button", "hero"]
+      "components": ["text", "image", "button", "hero", "navigation-lists"]
     },
     {
       "id": "text",
