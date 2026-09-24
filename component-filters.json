@@ -38,6 +38,12 @@
     ]
   },
   {
+    "id": "header-section",
+    "components": [
+      "text"
+    ]
+  },
+  {
     "id": "text",
     "rte": {
       "toolbar": {
