@@ -38,6 +38,16 @@ export const ENV_CONFIG: EnvConfigEntry[] = [
     hcaptchaSiteKey: '740c6c8a-6f1e-4a52-9ce0-069ce33451fc',
   },
   {
+    env: 'stage',
+    publishUrl: 'https://publish-p35060-e2270128.adobeaemcloud.com',
+    hostnames: [
+      'author-p35060-e2270128.adobeaemcloud.com',
+      'main--capella-hotels--wpp-public.aem.page',
+      'main--capella-hotels--wpp-public.aem.live',
+    ],
+    hcaptchaSiteKey: '740c6c8a-6f1e-4a52-9ce0-069ce33451fc',
+  },
+  {
     // Fallback: unknown hostname → warn and use RDE publish
     env: 'dev',
     publishUrl: 'https://publish-p152536-e1620746.adobeaemcloud.com',
