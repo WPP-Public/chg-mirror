@@ -41,7 +41,10 @@
   {
     "id": "header-section",
     "components": [
-      "text"
+      "text",
+      "image",
+      "button",
+      "hero"
     ]
   },
   {

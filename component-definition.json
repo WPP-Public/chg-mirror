@@ -84,7 +84,8 @@
               "page": {
                 "resourceType": "core/franklin/components/section/v1/section",
                 "template": {
-                  "model": "section",
+                  "name": "Header Section",
+                  "model": "header-section",
                   "filter": "header-section"
                 }
               }
