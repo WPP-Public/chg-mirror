@@ -52,6 +52,13 @@
               "value": "secondary"
             }
           ]
+        },
+        {
+          "component": "boolean",
+          "name": "openInNewTab",
+          "label": "Open in New Tab",
+          "valueType": "boolean",
+          "value": false
         }
       ]
     }
